@@ -46,7 +46,7 @@ const Admin = () => {
       <Text style={styles.subHeading}>Selected Questions:</Text>
       <FlatList
         data={selectedQuestions}
-        renderItem={({ id }) => (
+        renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => removeQuestion(item.id)}
             style={styles.selectedQuestionItem}
