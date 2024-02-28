@@ -2,10 +2,12 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Image, Text, View, ActivityIndicator } from 'react-native';
 import { useState, useEffect } from 'react';
 
-export default function Questioner() {
+export default function Questioner(params) {
+    const payload = params.route.params.payload
+
   return (
     <View style={styles.container}>
-      <Text>Questioner</Text>
+      <Text>{payload}</Text>
     </View>
   );
 }

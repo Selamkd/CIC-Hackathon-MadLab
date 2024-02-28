@@ -9,10 +9,10 @@ export default function Dashboard({navigation}) {
     <View style={styles.container}>
         <View style={ styles.iconList}>
             
-        <DashboardIcon style={styles.iconShadow}title={"WorkShop 1"}></DashboardIcon>
-      <DashboardIcon title={"WorkShop 2"}></DashboardIcon>
-      <DashboardIcon title={"WorkShop 1"}></DashboardIcon>
-      <DashboardIcon title={"WorkShop 2"}></DashboardIcon>
+    
+      <DashboardIcon navigation={navigation} payload={"Questions1"} title={"WorkShop 1"}></DashboardIcon>
+      <DashboardIcon navigation={navigation} payload={"Questions2"} title={"WorkShop 2"}></DashboardIcon>
+
         </View>
     </View>
   );
