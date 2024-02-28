@@ -13,7 +13,8 @@ import Questioner from "./screens/Questioner"
 export default function App() {
   const Stack = createStackNavigator();
   useEffect(() => {
-    storeData("questions", questions)
+    getData("questions").then(q=>{!q? storeData("questions", questions):null}).catch(err=>console.log(err))
+    // storeData("questions", questions)
   
     return () => {
      

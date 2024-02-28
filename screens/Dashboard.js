@@ -4,18 +4,19 @@ import { useState, useEffect } from 'react';
 
 import DashboardIcon from '../components/DashboadIcon';
 
+
 export default function Dashboard({payload, navigation }) {
   return (
     <View style={styles.container}>
 
       <View style={styles.iconList}>
-        <DashboardIcon
+        <DashboardIcon navigation ={navigation} payload = {"question1"}
           style={styles.iconShadow}
           title={'WorkShop 1'}
         ></DashboardIcon>
-        <DashboardIcon navigation ={navigation} payload = {"question1"} title={'WorkShop 2'}></DashboardIcon>
-        <DashboardIcon title={'WorkShop 1'}></DashboardIcon>
-        <DashboardIcon title={'WorkShop 2'}></DashboardIcon>
+        <DashboardIcon navigation ={navigation} payload = {"question2"} title={'WorkShop 2'}></DashboardIcon>
+        <DashboardIcon navigation ={navigation} payload = {"question3"} title={'WorkShop 3'}></DashboardIcon>
+        <DashboardIcon navigation ={navigation} payload = {"question4"} title={'WorkShop 4'}></DashboardIcon>
       </View>
 
     </View>

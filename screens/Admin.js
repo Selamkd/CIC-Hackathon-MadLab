@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {getData,storeData} from '../utils/AsyncStorage';
 
+
 const questions = [
   { id: 1, text: 'What is your age?', type: 'text' },
   { id: 2, text: 'What is your gender identity?', type: 'text' },
@@ -40,10 +41,13 @@ const questions = [
   { id: 13, text: 'How did you find out about our workshops?', type: 'text' },
 ];
 
+
 const Admin = () => {
+    const [questionList, setQuestionList] = useState([])
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
   useEffect(() => {
+    getData("questions").then(x=>setQuestionList(x)).catch(er=>console.log(er))
     const loadSelectedQuestions = async () => {
       const savedQuestions = await getData('selectedQuestions');
       if (savedQuestions) {
@@ -69,7 +73,7 @@ const Admin = () => {
       (q) => q.id !== questionId
     );
     setSelectedQuestions(updatedQuestions);
-    await storeData('selectedQuestions', updatedQuestions);
+    // await storeData('selectedQuestions', updatedQuestions);
   };
 
   const renderQuestionItem = ({ item }) => (
@@ -83,28 +87,31 @@ const Admin = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Admin Interface</Text>
+        <View style={styles.listBlock}>
 
+      <Text style={styles.heading}>Admin Interface</Text>
       <Text style={styles.subHeading}>Available Questions:</Text>
       <FlatList
-        data={questions}
+        data={questionList}
         renderItem={renderQuestionItem}
         keyExtractor={(item) => item.id.toString()}
-      />
-
+        />
+        </View>
+    <View style={styles.selectBlock}>
       <Text style={styles.subHeading}>Selected Questions:</Text>
       <FlatList
         data={selectedQuestions}
         renderItem={({ item }) => (
-          <TouchableOpacity
+            <TouchableOpacity
             onPress={() => removeQuestion(item.id)}
             style={styles.selectedQuestionItem}
-          >
+            >
             <Text>{item.text}</Text>
           </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id.toString()}
-      />
+        />
+</View>
 
       <TouchableOpacity
         style={styles.submitButton}
@@ -157,6 +164,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  listBlock:{
+    flex:2
+  },
+  selectBlock:{
+    flex:2
+  }
 });
 
 export default Admin;
