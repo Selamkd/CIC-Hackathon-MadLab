@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 export default function Admin() {
   return (
     <View style={styles.container}>
-      <Text>Adminn</Text>
+      <Text>Adminnnn</Text>
     </View>
   );
 }
