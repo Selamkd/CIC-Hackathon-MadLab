@@ -13,7 +13,7 @@ export default function Dashboard({payload, navigation }) {
           style={styles.iconShadow}
           title={'WorkShop 1'}
         ></DashboardIcon>
-        <DashboardIcon navigation ={navigation} payload = {payload} title={'WorkShop 2'}></DashboardIcon>
+        <DashboardIcon navigation ={navigation} payload = {"question1"} title={'WorkShop 2'}></DashboardIcon>
         <DashboardIcon title={'WorkShop 1'}></DashboardIcon>
         <DashboardIcon title={'WorkShop 2'}></DashboardIcon>
       </View>
