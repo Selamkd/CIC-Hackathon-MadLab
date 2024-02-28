@@ -2,9 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Image, Text, View, ActivityIndicator } from 'react-native';
 import { useState, useEffect } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-export default function DashboardIcon({title}) {
+export default function DashboardIcon({title, navigation, payload}) {
+  
   return (
-        <TouchableOpacity style={styles.iconShadow}>
+        <TouchableOpacity style={styles.iconShadow} onPress={()=>navigation.navigate('Questioner',{payload})}>
     <View style={styles.container}>
 
       <Text>
@@ -17,7 +18,6 @@ export default function DashboardIcon({title}) {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 2,
     backgroundColor: '#FFFFFF60',
     
     alignItems: 'center',
@@ -27,10 +27,7 @@ const styles = StyleSheet.create({
     borderRadius:25,
     padding:10,
     width: 200,
-    height: 200,
-    
-    
-    
+    height: 200,   
      },
      iconShadow:{
         shadowColor: "black",
