@@ -54,9 +54,14 @@ const Admin = () => {
   }, []);
 
   const addQuestion = async (question) => {
-    const updatedQuestions = [...selectedQuestions, question];
-    setSelectedQuestions(updatedQuestions);
-    await storeData('selectedQuestions', updatedQuestions);
+    const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
+    if (!isDuplicate) {
+      const updatedQuestions = [...selectedQuestions, question];
+      setSelectedQuestions(updatedQuestions);
+      await storeData('selectedQuestions', updatedQuestions);
+    } else {
+      console.log('This question already exists in the selected questions.');
+    }
   };
 
   const removeQuestion = async (questionId) => {
