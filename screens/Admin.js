@@ -40,7 +40,7 @@ const Admin = () => {
       <FlatList
         data={questions}
         renderItem={renderQuestionItem}
-        keyExtractor={(id) => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
 
       <Text style={styles.subHeading}>Selected Questions:</Text>
