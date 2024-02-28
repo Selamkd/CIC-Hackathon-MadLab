@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 import DashboardIcon from '../components/DashboadIcon';
 
-export default function Dashboard({ navigation }) {
+export default function Dashboard({payload, navigation }) {
   return (
     <View style={styles.container}>
 
@@ -13,7 +13,7 @@ export default function Dashboard({ navigation }) {
           style={styles.iconShadow}
           title={'WorkShop 1'}
         ></DashboardIcon>
-        <DashboardIcon title={'WorkShop 2'}></DashboardIcon>
+        <DashboardIcon navigation ={navigation} payload = {payload} title={'WorkShop 2'}></DashboardIcon>
         <DashboardIcon title={'WorkShop 1'}></DashboardIcon>
         <DashboardIcon title={'WorkShop 2'}></DashboardIcon>
       </View>

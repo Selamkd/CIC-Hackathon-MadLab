@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getData,storeData} from '../utils/AsyncStorage';
 
 const questions = [
   { id: 1, text: 'What is your age?', type: 'text' },
   { id: 2, text: 'What is your gender identity?', type: 'text' },
-  { id: 3, text: 'What is your ethnicity or race?', type: 'text' },
+  { id: 3, text: 'What is your ethnicity or race?', type: 'droplist',options:["Red","Green","Blue"] },
   { id: 4, text: 'Where are you located?', type: 'text' },
   {
     id: 5,

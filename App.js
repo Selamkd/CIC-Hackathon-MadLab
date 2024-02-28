@@ -3,6 +3,8 @@ import { StyleSheet, Image, Text, View, ActivityIndicator, TouchableOpacity, Saf
 import { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import {getData,storeData} from './utils/AsyncStorage';
+import questions from './utils/Questions';
 
 import Admin from "./screens/Admin"
 import Dashboard from "./screens/Dashboard"
@@ -10,8 +12,16 @@ import Questioner from "./screens/Questioner"
 
 export default function App() {
   const Stack = createStackNavigator();
+  useEffect(() => {
+    storeData("questions", questions)
+  
+    return () => {
+     
+    }
+  }, [])
+  
   return (
-    // <SafeAreaView>
+ 
     <NavigationContainer>
     <Stack.Navigator>
 
@@ -41,7 +51,7 @@ export default function App() {
         />
     </Stack.Navigator>
   </NavigationContainer>
-  // </SafeAreaView>
+
   );
 }
 
