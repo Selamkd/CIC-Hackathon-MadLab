@@ -1,12 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button, FlatList, TextInput } from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const questions = [
@@ -42,24 +37,67 @@ const questions = [
 ];
 
 const Admin = () => {
+  const [formTitle, setFormTitle] = useState('');
+  const [formDescription, setFormDescription] = useState('');
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [availableQuestions, setAvailableQuestions] = useState([...questions]);
 
   useEffect(() => {
-    const loadSelectedQuestions = async () => {
-      const savedQuestions = await getData('selectedQuestions');
-      if (savedQuestions) {
-        setSelectedQuestions(savedQuestions);
-      }
-    };
-    loadSelectedQuestions();
+    loadForm();
   }, []);
+
+  const loadForm = async () => {
+    try {
+      const storedForm = await AsyncStorage.getItem('form');
+      if (storedForm) {
+        const parsedForm = JSON.parse(storedForm);
+        setFormTitle(parsedForm.title);
+        setFormDescription(parsedForm.description);
+        setSelectedQuestions(parsedForm.selectedQuestions);
+        updateAvailableQuestions(parsedForm.selectedQuestions);
+      }
+    } catch (error) {
+      console.error('Error loading form:', error);
+    }
+  };
+
+  const updateAvailableQuestions = (selected) => {
+    const remainingQuestions = questions.filter(
+      (question) => !selected.some((selectedQ) => selectedQ.id === question.id)
+    );
+    setAvailableQuestions(remainingQuestions);
+  };
+
+  const saveForm = async () => {
+    try {
+      const form = {
+        title: formTitle,
+        description: formDescription,
+        selectedQuestions,
+      };
+      await AsyncStorage.setItem('form', JSON.stringify(form));
+    } catch (error) {
+      console.error('Error saving form:', error);
+    }
+  };
+
+  const updateFormTitle = (title) => {
+    setFormTitle(title);
+    saveForm();
+  };
+
+  const updateFormDescription = (description) => {
+    setFormDescription(description);
+    saveForm();
+  };
 
   const addQuestion = async (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
     if (!isDuplicate) {
       const updatedQuestions = [...selectedQuestions, question];
       setSelectedQuestions(updatedQuestions);
-      await storeData('selectedQuestions', updatedQuestions);
+      updateAvailableQuestions(updatedQuestions);
+      saveForm();
     } else {
       console.log('This question already exists in the selected questions.');
     }
@@ -70,16 +108,89 @@ const Admin = () => {
       (q) => q.id !== questionId
     );
     setSelectedQuestions(updatedQuestions);
-    await storeData('selectedQuestions', updatedQuestions);
+    updateAvailableQuestions(updatedQuestions);
+    saveForm();
   };
 
-  const renderQuestionItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => addQuestion(item)}
-      style={styles.questionItem}
-    >
-      <Text>{item.text}</Text>
-    </TouchableOpacity>
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Form Title:</Text>
+      <TextInput
+        style={styles.input}
+        value={formTitle}
+        onChangeText={updateFormTitle}
+      />
+
+      <Text style={styles.title}>Form Description:</Text>
+      <TextInput
+        style={styles.input}
+        value={formDescription}
+        onChangeText={updateFormDescription}
+      />
+
+      <Text style={styles.title}>Selected Questions:</Text>
+      <FlatList
+        data={selectedQuestions}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => removeQuestion(item.id)}
+            style={styles.selectedQuestionItem}
+          >
+            <Text>{item.text}</Text>
+          </TouchableOpacity>
+        )}
+      />
+
+      <Text style={styles.title}>Available Questions:</Text>
+      <FlatList
+        data={availableQuestions}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => addQuestion(item)}
+            style={styles.questionItem}
+          >
+            <Text>{item.text}</Text>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Save/Update Button */}
+      <Button title="Save/Update Form" onPress={saveForm} />
+    </View>
   );
+};
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    marginVertical: 8,
+  },
+  questionItem: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    marginVertical: 8,
+  },
+  selectedQuestionItem: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#e0e0e0',
+    padding: 8,
+    marginVertical: 8,
+  },
+});
 
+export default Admin;
