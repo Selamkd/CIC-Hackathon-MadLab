@@ -22,22 +22,35 @@ export default function Dashboard({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.text}>Sign up for a workshop</Text>
       <View style={styles.iconList}>
         <DashboardIcon
           navigation={navigation}
           payload={'question1'}
-          style={styles.iconShadow}
-          title={'WorkShop 1'}
+          title={'Decorate Your Own Money Box'}
+          description={
+            'Join us at Offerton Library on Mon Feb 12, 2024 at 10:30 AM for a fun-filled event where you can unleash your creativity and personalise your very own money box!'
+          }
         ></DashboardIcon>
+
         <DashboardIcon
           navigation={navigation}
+          style={styles.icon}
           payload={'question2'}
-          title={'WorkShop 2'}
+          title={'Talk about money CIC'}
+          description={
+            'Come and join us at our supportive, friendly peer support group. You can get specialist guidance from the group facilitator, share tips with others, and most importantly get help to make a plan and then follow that plan, step by step.'
+          }
         ></DashboardIcon>
+
         <DashboardIcon
+          style={styles.icon}
           navigation={navigation}
           payload={'question3'}
-          title={'WorkShop 3'}
+          title={'Financial inclusion'}
+          description={
+            'Join us at Main Street Community Center on Sat Mar 15, 2024 at 2:00 PM for an enlightening workshop on financial inclusion.'
+          }
         ></DashboardIcon>
       </View>
       <Text
@@ -45,9 +58,7 @@ export default function Dashboard({ navigation }) {
           setRef(!ref);
           console.log(listAllSessionForms);
         }}
-      >
-        Consolelog
-      </Text>
+      ></Text>
     </View>
   );
 }
@@ -61,7 +72,19 @@ const styles = StyleSheet.create({
   iconList: {
     gap: 20,
     justifyContent: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: 'column',
+    flexWrap: 'no-wrap',
+    alignItems: 'center',
+    width: '100%',
+  },
+  icon: {
+    backgroundColor: 'black',
+  },
+  text: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 17,
+    color: '#013220',
+    fontWeight: 'bold',
   },
 });
