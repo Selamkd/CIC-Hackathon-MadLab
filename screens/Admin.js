@@ -21,6 +21,7 @@ const Admin = (props) => {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [sessionName, setSessionName] = useState('');
   const [questionerList, setQuestionerList] = useState([]);
+  const[upteState ,setUpdateStae] = useState(true)
   useEffect(() => {
     getData('questions')
       .then((x) => setQuestionList(x))
@@ -29,27 +30,19 @@ const Admin = (props) => {
       .then((x) => (x ? setQuestionerList(x) : null))
       .catch((er) => console.log(er));
     console.log(questionerList, 'admin');
-    // const loadSelectedQuestions = async () => {
-    //   const savedQuestions = await getData('selectedQuestions');
-    //   if (savedQuestions) {
-    //     setSelectedQuestions(savedQuestions);
-    //   }
-    // };
-    // loadSelectedQuestions();
+  
   }, []);
   //// check function
-  
+const updateState = (SN,QL)=>{
+  const newQuestioner ={id:questionerList.length+1 ,name:SN, created:new Date(Date.now()), questions:QL}
+  setQuestionerList([...questionerList,newQuestioner])
+ }
+
   const handleSubmit =()=>{
-    const newQuestioner ={id:questionerList.length+1 ,name:sessionName, created:new Date(Date.now()), questions:selectedQuestions}
-    setQuestionerList([...questionerList,newQuestioner])
-    console.log(questionerList, "qlAdmin")
-    storeData("sessionForms", questionerList).then(()=>{setSessionName('');console.log()}).catch(er=>console.log(er))
+    setUpdateStae(!upteState)
+    return storeData("sessionForms", questionerList).then(()=>props.navigation.navigate('Dashboard')).catch(er=>console.log(er))
   }
-  useEffect(() => {
-    console.log(selectedQuestions,sessionName)
   
-  
-  }, [selectedQuestions,sessionName])
   
 
   const addQuestion =  (question) => {
@@ -115,7 +108,8 @@ const Admin = (props) => {
 
       <TouchableOpacity
         style={styles.submitButton}
-        onPress={() => handleSubmit()}
+        onPressOut={handleSubmit}
+        onPressIn={  ()=>updateState(sessionName, selectedQuestions)}
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
