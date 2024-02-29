@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
-import { getData } from '../utils/AsyncStorage';
+import { getData, storeData } from '../utils/AsyncStorage';
 
 
-export default function Questioner({ route }) {
+export default function Questioner({ route ,navigation}) {
   const payload = route.params?.payload;
   const [formData, setFormData] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -49,7 +49,9 @@ export default function Questioner({ route }) {
             keyExtractor={(item) => item.id.toString()}
           />
           <TouchableOpacity style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>Submit</Text>
+            <Text 
+            onPressIn={()=>{storeData("responseStore", answers).then(navigation.navigate("Dashboard"))}}
+            style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
         </View>
       ) : (
