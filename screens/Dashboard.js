@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { getData, removeData, storeData } from '../utils/AsyncStorage';
 import DashboardIcon from '../components/DashboadIcon';
 
@@ -43,7 +43,30 @@ export default function Dashboard({ navigation }) {
       <Text style={styles.text}>Sign up for a workshop</Text>
       <View style={styles.iconList}>
 
-        {sessionForms.map((form) => (
+
+      <FlatList
+          data={sessionForms}
+          renderItem={({ item }) => (
+            <View key={item.id} style={styles.formContainer}>
+            <DashboardIcon
+              navigation={navigation}
+              payload={item.id}
+              style={styles.iconShadow}
+              title={item.name}
+            />
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveForm(item.id)}
+            >
+              <Text style={styles.removeButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+            
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+
+        {/* {sessionForms.map((form) => (
           <View key={form.id} style={styles.formContainer}>
             <DashboardIcon
               navigation={navigation}
@@ -58,7 +81,7 @@ export default function Dashboard({ navigation }) {
               <Text style={styles.removeButtonText}>X</Text>
             </TouchableOpacity>
           </View>
-        ))}
+        ))} */}
       </View>
       <TouchableOpacity
         style={styles.submitButton}
@@ -78,6 +101,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconList: {
+    flex:2,
+    overflow: "scroll",
     gap: 20,
     justifyContent: 'center',
     flexDirection: 'column',
