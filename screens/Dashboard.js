@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import { getData, removeData, storeData } from '../utils/AsyncStorage';
 import DashboardIcon from '../components/DashboadIcon';
 
-
 export default function Dashboard({ navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
-  const [refS, setRefS]=useState(true)
-  const refreshState=()=>setRefS(!refS)
+  const [refS, setRefS] = useState(true);
+  const refreshState = () => setRefS(!refS);
   const loadSessionForms = async () => {
     const forms = await getData('sessionForms');
     if (forms) {
@@ -42,26 +47,23 @@ export default function Dashboard({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.text}>Sign up for a workshop</Text>
       <View style={styles.iconList}>
-
-
-      <FlatList
+        <FlatList
           data={sessionForms}
           renderItem={({ item }) => (
             <View key={item.id} style={styles.formContainer}>
-            <DashboardIcon
-              navigation={navigation}
-              payload={item.id}
-              style={styles.iconShadow}
-              title={item.name}
-            />
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => handleRemoveForm(item.id)}
-            >
-              <Text style={styles.removeButtonText}>X</Text>
-            </TouchableOpacity>
-          </View>
-            
+              <DashboardIcon
+                navigation={navigation}
+                payload={item.id}
+                style={styles.iconShadow}
+                title={item.name}
+              />
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => handleRemoveForm(item.id)}
+              >
+                <Text style={styles.removeButtonText}>X</Text>
+              </TouchableOpacity>
+            </View>
           )}
           keyExtractor={(item) => item.id.toString()}
         />
@@ -85,7 +87,7 @@ export default function Dashboard({ navigation }) {
       </View>
       <TouchableOpacity
         style={styles.submitButton}
-        onPressOut={()=>storeData("sessionForms",[]).then(refreshState())}
+        onPressOut={() => storeData('sessionForms', []).then(refreshState())}
         // onPressIn={() => updateState(sessionName, selectedQuestions)}
       >
         <Text style={styles.submitButtonText}>Clear All session</Text>
@@ -101,8 +103,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconList: {
-    flex:2,
-    overflow: "scroll",
+    flex: 2,
+    overflow: 'scroll',
     gap: 20,
     justifyContent: 'center',
     flexDirection: 'column',
