@@ -19,8 +19,8 @@ export default function Dashboard({ navigation }) {
     
   return (
     <View style={styles.container}>
-
       <View style={styles.iconList}>
+
         <DashboardIcon navigation ={navigation} payload = {"question1"}
           style={styles.iconShadow}
           title={'WorkShop 1'}
@@ -30,6 +30,7 @@ export default function Dashboard({ navigation }) {
         
       </View>
         <Text onPress={()=>{ setRef(!ref);console.log(listAllSessionForms)}}>Consolelog</Text>
+
     </View>
   );
 }
