@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -81,5 +80,4 @@ const Admin = () => {
       <Text>{item.text}</Text>
     </TouchableOpacity>
   );
-
-
+};
