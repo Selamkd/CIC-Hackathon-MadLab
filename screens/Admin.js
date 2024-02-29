@@ -10,8 +10,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const questions = [
   { id: 1, text: 'What is your age?', type: 'text' },
+
   { id: 2, text: 'What is your gender identity?', type: 'text' },
+
   { id: 3, text: 'What is your ethnicity or race?', type: 'text' },
+
   { id: 4, text: 'Where are you located?', type: 'text' },
   {
     id: 5,
@@ -43,22 +46,11 @@ const questions = [
 const Admin = () => {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
-  useEffect(() => {
-    const loadSelectedQuestions = async () => {
-      const savedQuestions = await getData('selectedQuestions');
-      if (savedQuestions) {
-        setSelectedQuestions(savedQuestions);
-      }
-    };
-    loadSelectedQuestions();
-  }, []);
-
   const addQuestion = async (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
     if (!isDuplicate) {
       const updatedQuestions = [...selectedQuestions, question];
       setSelectedQuestions(updatedQuestions);
-      await storeData('selectedQuestions', updatedQuestions);
     } else {
       console.log('This question already exists in the selected questions.');
     }
@@ -69,7 +61,6 @@ const Admin = () => {
       (q) => q.id !== questionId
     );
     setSelectedQuestions(updatedQuestions);
-    await storeData('selectedQuestions', updatedQuestions);
   };
 
   const renderQuestionItem = ({ item }) => (
