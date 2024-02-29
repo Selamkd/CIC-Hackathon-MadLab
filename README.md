@@ -10,23 +10,24 @@ The **Community Information Collection (CIC) App** is a mobile application desig
 - [Usage](#usage)
 - [Features](#features)
 - [Technology](#technologies-used)
-- [Issues](#current-issues)
+- [Issues](#issues)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Installation
+# Installation
 
 To run the CIC App locally on your development machine, follow these steps:
 
-# Clone the repository
+Clone the repository
 `git clone https://github.com/your-username/cic-app.git`
 
-# Navigate to the project directory
+Navigate to the project directory
 `cd cic-app`
 
-# Install dependencies
-'npm install`
+Install dependencies
+`npm install`
 
+```
 "dependencies": {
     "@react-native-async-storage/async-storage": "^1.22.3",
     "@react-navigation/native": "^6.1.14",
@@ -37,44 +38,42 @@ To run the CIC App locally on your development machine, follow these steps:
     "react-native": "0.73.4",
     "react-native-gesture-handler": "~2.14.0"
   },
+```
 
 ## Start the application and scan QR code with device
 `npx expo start`
 
-## Usage
+# Usage
 
 The CIC App is designed for workshop organizers at the CIC to easily collect demographic data from participants. Users can create and manage custom forms for different workshops, ensuring flexibility based on funder requirements. The app minimizes the collection of unnecessary personal data and focuses on key demographics, including gender, pronouns, age, ethnicity, disability, employment status, postcode, household size, and information about household members.
 
-# Start the application
-`npm start`
+# Features
 
-## Features
+- **Custom Forms:** Create and manage bespoke forms for different workshops.
+- **Flexible Demographics:** Collect a variety of demographics based on specific workshop requirements.
+- **Data Security:** Minimize the collection of sensitive personal data to prioritize user privacy.
+- **Efficient Reporting:** Download group demographic data into spreadsheets for easy reporting.
 
-    Custom Forms: Create and manage bespoke forms for different workshops.
-    Flexible Demographics: Collect a variety of demographics based on specific workshop requirements.
-    Data Security: Minimize the collection of sensitive personal data to prioritize user privacy.
-    Efficient Reporting: Download group demographic data into spreadsheets for easy reporting.
-
-## Technologies Used
+# Technologies Used
 
 - React Native
 - Expo
 
-## Issues
+# Issues
 
-  - Exporting user input to a spreadsheet.
-  - Custom question entry.
+- Exporting user input to a spreadsheet.
+- Custom question entry.
 
-## Contributing
+# Contributing
 
 We welcome contributions to enhance the CIC App. To contribute, follow these steps:
 
-    Fork the project.
-    Create a new branch (git checkout -b feature/your-feature).
-    Commit your changes (git commit -am 'Add some feature').
-    Push to the branch (git push origin feature/your-feature).
-    Open a pull request.
+- Fork the project.
+- Create a new branch (git checkout -b feature/your-feature).
+- Commit your changes (git commit -am 'Add some feature').
+- Push to the branch (git push origin feature/your-feature).
+- Open a pull request.
 
-## License
+# License
 
 This project is licensed under the MIT License.
