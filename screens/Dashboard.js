@@ -5,7 +5,7 @@ import DashboardIcon from '../components/DashboadIcon';
 
 export default function Dashboard({ navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
-
+  const [isLive, setIsLive] = useState(false)
   const [refS, setRefS] = useState(true);
 
   const refreshState = () => setRefS(!refS);
@@ -37,9 +37,17 @@ export default function Dashboard({ navigation }) {
   }, [navigation, refS]);
 
   const handleRemoveForm = async (formId) => {
-    // Remove the form from AsyncStorage
+    console.log("rrr")
+    const forms= sessionforms.filter((x)=>x.id != formID)
+    setSessionForms(forms)
+    refreshState()
+    try {
+      
+      await storeData('sessionForms',sessionForms);
+    } catch (error) {
+      console.log(err)
+    }
 
-    await removeData(`sessionForms_${formId}`);
 
     // Reload the session forms
 
@@ -58,6 +66,7 @@ export default function Dashboard({ navigation }) {
           renderItem={({ item }) => (
             <View key={item.id} style={styles.formContainer}>
             <DashboardIcon
+            onPress={()=>setIsLive(!isLive)}
               navigation={navigation}
               payload={item.id}
               style={styles.iconShadow}
@@ -65,12 +74,14 @@ export default function Dashboard({ navigation }) {
               description={item.description}
             />
 
-            <TouchableOpacity
+            { <TouchableOpacity
               style={styles.removeButton}
-              onPress={() => handleRemoveForm(item.id)}
+              // onPress={() => handleRemoveForm(item.id)}
+              // onPress={()=>generateExcelFromJson()}
+
             >
-              <Text style={styles.removeButtonText}>X</Text>
-            </TouchableOpacity>
+               <Text style={styles.removeButtonText}>export</Text>
+            </TouchableOpacity>}
           </View>
             
           )}

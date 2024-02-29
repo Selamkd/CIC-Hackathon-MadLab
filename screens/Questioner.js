@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
-
+import generateExcelFromJson from '../utils/Export';
 
 export default function Questioner({ route ,navigation}) {
   const payload = route.params?.payload;
   const [formData, setFormData] = useState(null);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState([]);
+  const [responsStore, setResponeStore] = useState([]);
+
 
   useEffect(() => {
     const loadFormData = async () => {
@@ -19,7 +21,14 @@ export default function Questioner({ route ,navigation}) {
     };
 
     loadFormData();
-  }, [payload]);
+  }, [payload,answers]);
+  useEffect(() => {
+
+    getData("responseStore").then((data)=>{data? setResponeStore(data):storeData("responseStore",[])}).catch(er=>console.log(er))
+    
+   
+ }, [])
+  
 
   const handleAnswerChange = (questionId, answer) => {
     setAnswers((prevAnswers) => ({
@@ -34,7 +43,7 @@ export default function Questioner({ route ,navigation}) {
       <TextInput
         style={styles.answerInput}
         placeholder="Your answer"
-        onChangeText={(text) => handleAnswerChange(item.id, text)}
+        onChangeText={(text) => handleAnswerChange(item.text, text)}
       />
     </View>
   );
@@ -48,11 +57,24 @@ export default function Questioner({ route ,navigation}) {
             renderItem={renderQuestionItem}
             keyExtractor={(item) => item.id.toString()}
           />
-          <TouchableOpacity style={styles.submitButton}>
+          <TouchableOpacity style={styles.submitButton}
+            onPressIn={()=>{setResponeStore([...responsStore, answers]);console.log(responsStore)}}
+            onPressOut={()=>{storeData("responseStore", responsStore).then(()=>{setAnswers({});setFormData(null);console.log(answers)})}}  
+          >
             <Text 
-            onPressIn={()=>{storeData("responseStore", answers).then(navigation.navigate("Dashboard"))}}
+           
             style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
+
+
+          <TouchableOpacity style={styles.submitButton}
+          // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
+            >
+            <Text 
+           
+            style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+          
         </View>
       ) : (
         <Text>Loading form data...</Text>
