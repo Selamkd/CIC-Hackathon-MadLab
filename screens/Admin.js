@@ -44,11 +44,14 @@ const Admin = (props) => {
 
   const addQuestion = (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
+  
     if (!isDuplicate) {
+      // Remove the added question from questionList
+      const updatedQuestionList = questionList.filter((q) => q.id !== question.id);
+      setQuestionList(updatedQuestionList);
+  
       const updatedQuestions = [...selectedQuestions, question];
       setSelectedQuestions(updatedQuestions);
-
-      //   await storeData('selectedQuestions', updatedQuestions);
     } else {
       console.log('This question already exists in the selected questions.');
     }
