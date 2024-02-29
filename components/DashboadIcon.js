@@ -24,7 +24,7 @@ export default function DashboardIcon({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#e6e6e6',
-
+    marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
 
