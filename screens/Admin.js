@@ -6,11 +6,8 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import {getData,storeData} from '../utils/AsyncStorage';
+import { getData, storeData } from '../utils/AsyncStorage';
 import { TextInput } from 'react-native-gesture-handler';
-
-
-
 
 const questions = [
   { id: 1, text: 'What is your age?', type: 'text' },
@@ -47,19 +44,19 @@ const questions = [
   { id: 13, text: 'How did you find out about our workshops?', type: 'text' },
 ];
 
-
-
-
-
 const Admin = (props) => {
-    const [questionList, setQuestionList] = useState([])
+  const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
-  const [sessionName, setSessionName] = useState("")
-    const [questionerList, setQuestionerList]=useState([]) 
+  const [sessionName, setSessionName] = useState('');
+  const [questionerList, setQuestionerList] = useState([]);
   useEffect(() => {
-    getData("questions").then(x=>setQuestionList(x)).catch(er=>console.log(er))
-    getData("sessionForms").then(x=>x? setQuestionerList(x): null).catch(er=>console.log(er))
-    console.log(questionerList,"admin")
+    getData('questions')
+      .then((x) => setQuestionList(x))
+      .catch((er) => console.log(er));
+    getData('sessionForms')
+      .then((x) => (x ? setQuestionerList(x) : null))
+      .catch((er) => console.log(er));
+    console.log(questionerList, 'admin');
     // const loadSelectedQuestions = async () => {
     //   const savedQuestions = await getData('selectedQuestions');
     //   if (savedQuestions) {
@@ -69,34 +66,42 @@ const Admin = (props) => {
     // loadSelectedQuestions();
   }, []);
   //// check function
-  
-  const handleSubmit =()=>{
-    const newQuestioner ={id:1 ,name:sessionName, created:new Date(Date.now()), questions:selectedQuestions}
-    setQuestionerList([...questionerList,newQuestioner])
-    console.log(questionerList, "qlAdmin")
-    storeData("sessionForms", questionerList).then(()=>{setSessionName('');console.log()}).then(()=>props.navigation.navigate('Dashboard')).catch(er=>console.log(er))
-  }
 
+  const handleSubmit = () => {
+    const newQuestioner = {
+      id: 1,
+      name: sessionName,
+      created: new Date(Date.now()),
+      questions: selectedQuestions,
+    };
+    setQuestionerList([...questionerList, newQuestioner]);
+    console.log(questionerList, 'qlAdmin');
+    storeData('sessionForms', questionerList)
+      .then(() => {
+        setSessionName('');
+        console.log();
+      })
+      .then(() => props.navigation.navigate('Dashboard'))
+      .catch((er) => console.log(er));
+  };
 
-  const addQuestion = async (question) => {
+  const addQuestion = (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
     if (!isDuplicate) {
       const updatedQuestions = [...selectedQuestions, question];
       setSelectedQuestions(updatedQuestions);
 
-    //   await storeData('selectedQuestions', updatedQuestions);
-
+      //   await storeData('selectedQuestions', updatedQuestions);
     } else {
       console.log('This question already exists in the selected questions.');
     }
   };
 
-  const removeQuestion = async (questionId) => {
+  const removeQuestion = (questionId) => {
     const updatedQuestions = selectedQuestions.filter(
       (q) => q.id !== questionId
     );
     setSelectedQuestions(updatedQuestions);
-
   };
 
   const renderQuestionItem = ({ item }) => (
@@ -108,36 +113,37 @@ const Admin = (props) => {
     </TouchableOpacity>
   );
 
-
   return (
     <View style={styles.container}>
-        <View style={styles.listBlock}>
+      <View style={styles.listBlock}>
+        <Text style={styles.heading}>Admin Interface{sessionName}</Text>
 
-      <Text style={styles.heading}>Admin Interface{sessionName}</Text>
-
-      <TextInput placeholder={'Session Name'} onChangeText={(e)=>setSessionName(e)}></TextInput>
-      <Text style={styles.subHeading}>Available Questions:</Text>
-      <FlatList
-        data={questionList}
-        renderItem={renderQuestionItem}
-        keyExtractor={(item) => item.id.toString()}
+        <TextInput
+          placeholder={'Session Name'}
+          onChangeText={(e) => setSessionName(e)}
+        ></TextInput>
+        <Text style={styles.subHeading}>Available Questions:</Text>
+        <FlatList
+          data={questionList}
+          renderItem={renderQuestionItem}
+          keyExtractor={(item) => item.id.toString()}
         />
-        </View>
-    <View style={styles.selectBlock}>
-      <Text style={styles.subHeading}>Selected Questions:</Text>
-      <FlatList
-        data={selectedQuestions}
-        renderItem={({ item }) => (
+      </View>
+      <View style={styles.selectBlock}>
+        <Text style={styles.subHeading}>Selected Questions:</Text>
+        <FlatList
+          data={selectedQuestions}
+          renderItem={({ item }) => (
             <TouchableOpacity
-            onPress={() => removeQuestion(item.id)}
-            style={styles.selectedQuestionItem}
+              onPress={() => removeQuestion(item.id)}
+              style={styles.selectedQuestionItem}
             >
-            <Text>{item.text}</Text>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id.toString()}
+              <Text>{item.text}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id.toString()}
         />
-</View>
+      </View>
 
       <TouchableOpacity
         style={styles.submitButton}
@@ -190,12 +196,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  listBlock:{
-    flex:2
+  listBlock: {
+    flex: 2,
   },
-  selectBlock:{
-    flex:2
-  }
+  selectBlock: {
+    flex: 2,
+  },
 });
 
 export default Admin;
