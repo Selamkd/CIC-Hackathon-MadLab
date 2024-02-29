@@ -14,6 +14,7 @@ const Admin = (props) => {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [sessionName, setSessionName] = useState('');
   const [questionerList, setQuestionerList] = useState([]);
+  const [upteState, setUpdateStae] = useState(true);
   useEffect(() => {
     getData('questions')
       .then((x) => setQuestionList(x))
@@ -22,35 +23,24 @@ const Admin = (props) => {
       .then((x) => (x ? setQuestionerList(x) : null))
       .catch((er) => console.log(er));
     console.log(questionerList, 'admin');
-    // const loadSelectedQuestions = async () => {
-    //   const savedQuestions = await getData('selectedQuestions');
-    //   if (savedQuestions) {
-    //     setSelectedQuestions(savedQuestions);
-    //   }
-    // };
-    // loadSelectedQuestions();
   }, []);
   //// check function
-
-  const handleSubmit = () => {
+  const updateState = (SN, QL) => {
     const newQuestioner = {
       id: questionerList.length + 1,
-      name: sessionName,
+      name: SN,
       created: new Date(Date.now()),
-      questions: selectedQuestions,
+      questions: QL,
     };
     setQuestionerList([...questionerList, newQuestioner]);
-    console.log(questionerList, 'qlAdmin');
-    storeData('sessionForms', questionerList)
-      .then(() => {
-        setSessionName('');
-        console.log();
-      })
+  };
+
+  const handleSubmit = () => {
+    setUpdateStae(!upteState);
+    return storeData('sessionForms', questionerList)
+      .then(() => props.navigation.navigate('Dashboard'))
       .catch((er) => console.log(er));
   };
-  useEffect(() => {
-    console.log(selectedQuestions, sessionName);
-  }, [selectedQuestions, sessionName]);
 
   const addQuestion = (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
@@ -86,7 +76,7 @@ const Admin = (props) => {
         <Text style={styles.heading}>Admin Interface{sessionName}</Text>
 
         <TextInput
-          placeholder={'Workshop Name'}
+          placeholder={'Session Name'}
           onChangeText={(e) => setSessionName(e)}
         ></TextInput>
         <Text style={styles.subHeading}>Available Questions:</Text>
@@ -114,7 +104,8 @@ const Admin = (props) => {
 
       <TouchableOpacity
         style={styles.submitButton}
-        onPress={() => handleSubmit()}
+        onPressOut={handleSubmit}
+        onPressIn={() => updateState(sessionName, selectedQuestions)}
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
