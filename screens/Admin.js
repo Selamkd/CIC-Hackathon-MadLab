@@ -9,13 +9,6 @@ import {
 import { getData, storeData } from '../utils/AsyncStorage';
 import { TextInput } from 'react-native-gesture-handler';
 
-
-
-
-
-
-
-
 const Admin = (props) => {
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -33,6 +26,7 @@ const Admin = (props) => {
   
   }, []);
   //// check function
+
 const updateState = (SN,QL)=>{
   const newQuestioner ={id:questionerList.length+1 ,name:SN, created:new Date(Date.now()), questions:QL}
   setQuestionerList([...questionerList,newQuestioner])
@@ -45,7 +39,29 @@ const updateState = (SN,QL)=>{
   
   
 
-  const addQuestion =  (question) => {
+
+  const handleSubmit = () => {
+    const newQuestioner = {
+      id: questionerList.length + 1,
+      name: sessionName,
+      created: new Date(Date.now()),
+      questions: selectedQuestions,
+    };
+    setQuestionerList([...questionerList, newQuestioner]);
+    console.log(questionerList, 'qlAdmin');
+    storeData('sessionForms', questionerList)
+      .then(() => {
+        setSessionName('');
+        console.log();
+      })
+      .catch((er) => console.log(er));
+  };
+  useEffect(() => {
+    console.log(selectedQuestions, sessionName);
+  }, [selectedQuestions, sessionName]);
+
+
+  const addQuestion = (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
     if (!isDuplicate) {
       const updatedQuestions = [...selectedQuestions, question];
@@ -57,8 +73,7 @@ const updateState = (SN,QL)=>{
     }
   };
 
-
-  const removeQuestion =  (questionId) => {
+  const removeQuestion = (questionId) => {
     const updatedQuestions = selectedQuestions.filter(
       (q) => q.id !== questionId
     );
@@ -80,7 +95,7 @@ const updateState = (SN,QL)=>{
         <Text style={styles.heading}>Admin Interface{sessionName}</Text>
 
         <TextInput
-          placeholder={'Session Name'}
+          placeholder={'Workshop Name'}
           onChangeText={(e) => setSessionName(e)}
         ></TextInput>
         <Text style={styles.subHeading}>Available Questions:</Text>
