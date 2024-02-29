@@ -109,6 +109,7 @@ const Admin = (props) => {
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
+      
     </View>
   );
 };
