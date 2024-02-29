@@ -7,62 +7,44 @@ import {
   FlatList,
 } from 'react-native';
 import {getData,storeData} from '../utils/AsyncStorage';
+import { TextInput } from 'react-native-gesture-handler';
 
 
-const questions = [
-  { id: 1, text: 'What is your age?', type: 'text' },
-  { id: 2, text: 'What is your gender identity?', type: 'text' },
-  { id: 3, text: 'What is your ethnicity or race?', type: 'droplist',options:["Red","Green","Blue"] },
-  { id: 4, text: 'Where are you located?', type: 'text' },
-  {
-    id: 5,
-    text: 'What is your highest level of education completed?',
-    type: 'text',
-  },
-  { id: 6, text: 'What is your approximate household income?', type: 'text' },
-  {
-    id: 7,
-    text: 'What is the highest level of education and approximate income of your parents or guardians?',
-    type: 'text',
-  },
-  { id: 8, text: 'Are you currently employed?', type: 'text' },
-  { id: 9, text: 'What is the primary language spoken at home?', type: 'text' },
-  {
-    id: 10,
-    text: 'Do you have any accessibility needs we should be aware of?',
-    type: 'text',
-  },
-  { id: 11, text: 'What are your interests or hobbies?', type: 'text' },
-  {
-    id: 12,
-    text: 'Have you attended similar workshops or events before?',
-    type: 'text',
-  },
-  { id: 13, text: 'How did you find out about our workshops?', type: 'text' },
-];
 
 
-const Admin = () => {
+
+const Admin = (props) => {
     const [questionList, setQuestionList] = useState([])
   const [selectedQuestions, setSelectedQuestions] = useState([]);
-
+  const [sessionName, setSessionName] = useState("")
+    const [questionerList, setQuestionerList]=useState([]) 
   useEffect(() => {
     getData("questions").then(x=>setQuestionList(x)).catch(er=>console.log(er))
-    const loadSelectedQuestions = async () => {
-      const savedQuestions = await getData('selectedQuestions');
-      if (savedQuestions) {
-        setSelectedQuestions(savedQuestions);
-      }
-    };
-    loadSelectedQuestions();
+    getData("sessionForms").then(x=>x? setQuestionerList(x): null).catch(er=>console.log(er))
+    console.log(questionerList,"admin")
+    // const loadSelectedQuestions = async () => {
+    //   const savedQuestions = await getData('selectedQuestions');
+    //   if (savedQuestions) {
+    //     setSelectedQuestions(savedQuestions);
+    //   }
+    // };
+    // loadSelectedQuestions();
   }, []);
+  //// check function
+  
+  const handleSubmit =()=>{
+    const newQuestioner ={id:1 ,name:sessionName, created:new Date(Date.now()), questions:selectedQuestions}
+    setQuestionerList([...questionerList,newQuestioner])
+    console.log(questionerList, "qlAdmin")
+    storeData("sessionForms", questionerList).then(()=>{setSessionName('');console.log()}).then(()=>props.navigation.navigate('Dashboard')).catch(er=>console.log(er))
+  }
 
   const addQuestion = async (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
     if (!isDuplicate) {
       const updatedQuestions = [...selectedQuestions, question];
       setSelectedQuestions(updatedQuestions);
-      await storeData('selectedQuestions', updatedQuestions);
+    //   await storeData('selectedQuestions', updatedQuestions);
     } else {
       console.log('This question already exists in the selected questions.');
     }
@@ -85,11 +67,14 @@ const Admin = () => {
     </TouchableOpacity>
   );
 
+
   return (
     <View style={styles.container}>
         <View style={styles.listBlock}>
 
-      <Text style={styles.heading}>Admin Interface</Text>
+      <Text style={styles.heading}>Admin Interface{sessionName}</Text>
+
+      <TextInput placeholder={'Session Name'} onChangeText={(e)=>setSessionName(e)}></TextInput>
       <Text style={styles.subHeading}>Available Questions:</Text>
       <FlatList
         data={questionList}
@@ -115,7 +100,7 @@ const Admin = () => {
 
       <TouchableOpacity
         style={styles.submitButton}
-        onPress={() => console.log('Selected questions:', selectedQuestions)}
+        onPress={() => handleSubmit()}
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
