@@ -31,7 +31,7 @@ const Admin = (props) => {
     // loadSelectedQuestions();
   }, []);
   //// check function
-  
+  g
   const handleSubmit =()=>{
     const newQuestioner ={id:1 ,name:sessionName, created:new Date(Date.now()), questions:selectedQuestions}
     setQuestionerList([...questionerList,newQuestioner])
