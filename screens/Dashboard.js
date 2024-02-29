@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { getData, removeData } from '../utils/AsyncStorage';
+import { getData, removeData, storeData } from '../utils/AsyncStorage';
 import DashboardIcon from '../components/DashboadIcon';
+
 
 export default function Dashboard({ navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
-
+  const [refS, setRefS]=useState(true)
+  const refreshState=()=>setRefS(!refS)
   const loadSessionForms = async () => {
     const forms = await getData('sessionForms');
     if (forms) {
@@ -26,7 +28,7 @@ export default function Dashboard({ navigation }) {
       // Cleanup the event listener
       unsubscribeFocus();
     };
-  }, [navigation]);
+  }, [navigation, refS]);
 
   const handleRemoveForm = async (formId) => {
     // Remove the form from AsyncStorage
@@ -40,43 +42,7 @@ export default function Dashboard({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.text}>Sign up for a workshop</Text>
       <View style={styles.iconList}>
-<<<<<<< Updated upstream
-        <DashboardIcon
-          navigation={navigation}
-          payload={'question1'}
-          title={'Decorate Your Own Money Box'}
-          description={
-            'Join us at Offerton Library on Mon Feb 12, 2024 at 10:30 AM for a fun-filled event where you can unleash your creativity and personalise your very own money box!'
-          }
-        ></DashboardIcon>
 
-        <DashboardIcon
-          navigation={navigation}
-          style={styles.icon}
-          payload={'question2'}
-          title={'Talk about money CIC'}
-          description={
-            'Come and join us at our supportive, friendly peer support group. You can get specialist guidance from the group facilitator, share tips with others, and most importantly get help to make a plan and then follow that plan, step by step.'
-          }
-        ></DashboardIcon>
-
-        <DashboardIcon
-          style={styles.icon}
-          navigation={navigation}
-          payload={'question3'}
-          title={'Financial inclusion'}
-          description={
-            'Join us at Main Street Community Center on Sat Mar 15, 2024 at 2:00 PM for an enlightening workshop on financial inclusion.'
-          }
-        ></DashboardIcon>
-      </View>
-      <Text
-        onPress={() => {
-          setRef(!ref);
-          console.log(listAllSessionForms);
-        }}
-      ></Text>
-=======
         {sessionForms.map((form) => (
           <View key={form.id} style={styles.formContainer}>
             <DashboardIcon
@@ -94,7 +60,13 @@ export default function Dashboard({ navigation }) {
           </View>
         ))}
       </View>
->>>>>>> Stashed changes
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPressOut={()=>storeData("sessionForms",[]).then(refreshState())}
+        // onPressIn={() => updateState(sessionName, selectedQuestions)}
+      >
+        <Text style={styles.submitButtonText}>Clear All session</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -150,6 +122,18 @@ const styles = StyleSheet.create({
   removeButtonText: {
     color: '#fff',
     fontSize: 12,
+    fontWeight: 'bold',
+  },
+  submitButton: {
+    backgroundColor: '#51ad63',
+    padding: 15,
+    alignItems: 'center',
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

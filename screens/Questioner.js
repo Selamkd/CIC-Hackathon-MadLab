@@ -2,10 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { getData } from '../utils/AsyncStorage';
 
-<<<<<<< Updated upstream
-export default function Questioner(params) {
-  const payload = params.route.params.payload;
-=======
+
 export default function Questioner({ route }) {
   const payload = route.params?.payload;
   const [formData, setFormData] = useState(null);
@@ -41,8 +38,6 @@ export default function Questioner({ route }) {
       />
     </View>
   );
->>>>>>> Stashed changes
-
   return (
     <View style={styles.container}>
       {formData ? (
@@ -67,9 +62,7 @@ export default function Questioner({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-<<<<<<< Updated upstream
-    backgroundColor: '#fffff',
-=======
+
     backgroundColor: '#ffffff',
     padding: 20,
   },
@@ -95,7 +88,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: '#51ad63',
     padding: 15,
->>>>>>> Stashed changes
+
     alignItems: 'center',
     borderRadius: 5,
     marginTop: 20,
