@@ -62,7 +62,9 @@ export default function Dashboard({ navigation }) {
               payload={item.id}
               style={styles.iconShadow}
               title={item.name}
+              description={item.description}
             />
+
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => handleRemoveForm(item.id)}

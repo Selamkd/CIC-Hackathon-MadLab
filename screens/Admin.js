@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
 import { TextInput } from 'react-native-gesture-handler';
 
@@ -13,22 +7,25 @@ const Admin = (props) => {
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [sessionName, setSessionName] = useState('');
+  const [sessionDescription, setSessionDescription] = useState(''); // Added session description state
   const [questionerList, setQuestionerList] = useState([]);
   const [upteState, setUpdateStae] = useState(true);
+
   useEffect(() => {
     getData('questions')
       .then((x) => setQuestionList(x))
       .catch((er) => console.log(er));
+
     getData('sessionForms')
       .then((x) => (x ? setQuestionerList(x) : null))
       .catch((er) => console.log(er));
-    console.log(questionerList, 'admin');
   }, []);
-  //// check function
+
   const updateState = (SN, QL) => {
     const newQuestioner = {
       id: questionerList.length + 1,
       name: SN,
+      description: sessionDescription, // Include session description in the newQuestioner object
       created: new Date(Date.now()),
       questions: QL,
     };
@@ -44,12 +41,12 @@ const Admin = (props) => {
 
   const addQuestion = (question) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
-  
+
     if (!isDuplicate) {
       // Remove the added question from questionList
       const updatedQuestionList = questionList.filter((q) => q.id !== question.id);
       setQuestionList(updatedQuestionList);
-  
+
       const updatedQuestions = [...selectedQuestions, question];
       setSelectedQuestions(updatedQuestions);
     } else {
@@ -76,12 +73,19 @@ const Admin = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.listBlock}>
-        <Text style={styles.heading}>Admin Interface{sessionName}</Text>
+        <Text style={styles.heading}>Admin Interface</Text>
 
         <TextInput
           placeholder={'Session Name'}
           onChangeText={(e) => setSessionName(e)}
-        ></TextInput>
+        />
+
+        {/* Added TextInput for Session Description */}
+        <TextInput
+          placeholder={'Session Description'}
+          onChangeText={(e) => setSessionDescription(e)}
+        />
+
         <Text style={styles.subHeading}>Available Questions:</Text>
         <FlatList
           data={questionList}
@@ -112,7 +116,6 @@ const Admin = (props) => {
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
-      
     </View>
   );
 };
