@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 import { getData, removeData, storeData } from '../utils/AsyncStorage';
 import DashboardIcon from '../components/DashboadIcon';
 
 export default function Dashboard({ navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
-  const [isLive, setIsLive] = useState(false)
-  const [refS, setRefS] = useState(true);
-
-  const refreshState = () => setRefS(!refS);
 
   const loadSessionForms = async () => {
     const forms = await getData('sessionForms');
@@ -34,24 +37,28 @@ export default function Dashboard({ navigation }) {
 
       unsubscribeFocus();
     };
-  }, [navigation, refS]);
+  }, [navigation]);
 
-  const handleRemoveForm = async (formId) => {
-    console.log("rrr")
-    const forms= sessionforms.filter((x)=>x.id != formID)
-    setSessionForms(forms)
-    refreshState()
-    try {
-      
-      await storeData('sessionForms',sessionForms);
-    } catch (error) {
-      console.log(err)
-    }
-
-
-    // Reload the session forms
-
-    loadSessionForms();
+  const handleRemoveForm = (form) => {
+    Alert.alert(
+      'Think about it!',
+      `Do you really want to delete ${form.name || 'this'} form?`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            const forms = sessionForms.filter((x) => x.id != form.id);
+            setSessionForms(forms);
+            storeData('sessionForms', forms).catch((err) => console.log(err));
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -59,62 +66,23 @@ export default function Dashboard({ navigation }) {
       <Text style={styles.text}>Sign up for a workshop</Text>
 
       <View style={styles.iconList}>
-
-
-      <FlatList
+        <FlatList
           data={sessionForms}
           renderItem={({ item }) => (
             <View key={item.id} style={styles.formContainer}>
-            <DashboardIcon
-            onPress={()=>setIsLive(!isLive)}
-              navigation={navigation}
-              payload={item.id}
-              style={styles.iconShadow}
-              title={item.name}
-              description={item.description}
-            />
-
-            { <TouchableOpacity
-              style={styles.removeButton}
-              // onPress={() => handleRemoveForm(item.id)}
-              // onPress={()=>generateExcelFromJson()}
-
-            >
-               <Text style={styles.removeButtonText}>export</Text>
-            </TouchableOpacity>}
-          </View>
-            
+              <DashboardIcon
+                navigation={navigation}
+                payload={item}
+                session={[sessionForms, setSessionForms]}
+                style={styles.iconShadow}
+                title={item.name}
+                description={item.description}
+              />
+            </View>
           )}
           keyExtractor={(item) => item.id.toString()}
         />
-
-        {/* {sessionForms.map((form) => (
-          <View key={form.id} style={styles.formContainer}>
-            <DashboardIcon
-              navigation={navigation}
-              payload={form.id}
-              style={styles.iconShadow}
-              title={form.name}
-            />
-
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => handleRemoveForm(form.id)}
-            >
-              <Text style={styles.removeButtonText}>X</Text>
-            </TouchableOpacity>
-          </View>
-        ))} */}
       </View>
-
-      <TouchableOpacity
-        style={styles.submitButton}
-        onPressOut={() => storeData('sessionForms', []).then(refreshState())}
-
-        // onPressIn={() => updateState(sessionName, selectedQuestions)}
-      >
-        <Text style={styles.submitButtonText}>Clear All session</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -129,8 +97,8 @@ const styles = StyleSheet.create({
   },
 
   iconList: {
-    flex:2,
-    overflow: "scroll",
+    flex: 2,
+    overflow: 'scroll',
     gap: 20,
 
     justifyContent: 'center',
@@ -178,34 +146,6 @@ const styles = StyleSheet.create({
     shadowRadius: 9.11,
 
     elevation: 10,
-  },
-
-  removeButton: {
-    position: 'absolute',
-
-    top: 5,
-
-    right: 5,
-
-    backgroundColor: 'red',
-
-    borderRadius: 15,
-
-    width: 20,
-
-    height: 20,
-
-    alignItems: 'center',
-
-    justifyContent: 'center',
-  },
-
-  removeButtonText: {
-    color: '#fff',
-
-    fontSize: 12,
-
-    fontWeight: 'bold',
   },
 
   submitButton: {

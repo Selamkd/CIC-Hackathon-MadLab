@@ -54,16 +54,16 @@ const Admin = (props) => {
     }
   };
 
-  const removeQuestion = (questionId) => {
+  const removeQuestion = (question) => {
     const updatedQuestions = selectedQuestions.filter(
-      (q) => q.id !== questionId
+      (q) => q.id !== question.id
     );
     setSelectedQuestions(updatedQuestions);
   };
 
-  const renderQuestionItem = ({ item }) => (
+  const renderQuestionItem = ( item ,func) => (
     <TouchableOpacity
-      onPress={() => addQuestion(item)}
+      onPress={() => func(item)}
       style={styles.questionItem}
     >
       <Text>{item.text}</Text>
@@ -89,7 +89,7 @@ const Admin = (props) => {
         <Text style={styles.subHeading}>Available Questions:</Text>
         <FlatList
           data={questionList}
-          renderItem={renderQuestionItem}
+          renderItem={({item})=>renderQuestionItem(item, addQuestion)}
           keyExtractor={(item) => item.id.toString()}
         />
       </View>
@@ -97,14 +97,7 @@ const Admin = (props) => {
         <Text style={styles.subHeading}>Selected Questions:</Text>
         <FlatList
           data={selectedQuestions}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => removeQuestion(item.id)}
-              style={styles.selectedQuestionItem}
-            >
-              <Text>{item.text}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({item})=>renderQuestionItem(item,removeQuestion)}
           keyExtractor={(item) => item.id.toString()}
         />
       </View>

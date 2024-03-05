@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
 // import generateExcelFromJson from '../utils/Export';
 
-export default function Questioner({ route ,navigation}) {
-  const payload = route.params?.payload;
+export default function Questioner({ route, navigation }) {
+  const payload = route.params?.payload.id;
   const [formData, setFormData] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [responsStore, setResponeStore] = useState([]);
-
 
   useEffect(() => {
     const loadFormData = async () => {
@@ -21,14 +27,14 @@ export default function Questioner({ route ,navigation}) {
     };
 
     loadFormData();
-  }, [payload,answers]);
+  }, [payload, answers]);
   useEffect(() => {
-
-    getData("responseStore").then((data)=>{data? setResponeStore(data):storeData("responseStore",[])}).catch(er=>console.log(er))
-    
-   
- }, [])
-  
+    getData('responseStore')
+      .then((data) => {
+        data ? setResponeStore(data) : storeData('responseStore', []);
+      })
+      .catch((er) => console.log(er));
+  }, []);
 
   const handleAnswerChange = (questionId, answer) => {
     setAnswers((prevAnswers) => ({
@@ -57,24 +63,29 @@ export default function Questioner({ route ,navigation}) {
             renderItem={renderQuestionItem}
             keyExtractor={(item) => item.id.toString()}
           />
-          <TouchableOpacity style={styles.submitButton}
-            onPressIn={()=>{setResponeStore([...responsStore, answers]);console.log(responsStore)}}
-            onPressOut={()=>{storeData("responseStore", responsStore).then(()=>{setAnswers({});setFormData(null);console.log(answers)})}}  
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPressIn={() => {
+              setResponeStore([...responsStore, answers]);
+              console.log(responsStore);
+            }}
+            onPressOut={() => {
+              storeData('responseStore', responsStore).then(() => {
+                setAnswers({});
+                setFormData(null);
+                console.log(answers);
+              });
+            }}
           >
-            <Text 
-           
-            style={styles.submitButtonText}>Submit</Text>
+            <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
 
-
-          <TouchableOpacity style={styles.submitButton}
-          // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
-            >
-            <Text 
-           
-            style={styles.submitButtonText}>Submit</Text>
+          <TouchableOpacity
+            style={styles.submitButton}
+            // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
+          >
+            <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
-          
         </View>
       ) : (
         <Text>Loading form data...</Text>
