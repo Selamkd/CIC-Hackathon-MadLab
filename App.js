@@ -10,6 +10,7 @@ import Admin from "./screens/Admin"
 import Dashboard from "./screens/Dashboard"
 import Questioner from "./screens/Questioner"
 import SecondSplashScreen from './components/SecondSplashScreen';
+import SetupScreen from './screens/SetupScreen'
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -22,6 +23,7 @@ export default function App() {
     }
   }, [])
 
+  const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
   const [showSecondSplash, setShowSecondSplash] = useState(true);
   const [secondSplashConfig, setSecondSplashConfig] = useState({
     backgroundColor: '#51ad63',
@@ -29,6 +31,11 @@ export default function App() {
   });
 
   useEffect(() => {
+    // Check if it's the first time setup
+    getData('isFirstTimeSetup').then((firstTimeSetup) => {
+      setIsFirstTimeSetup(firstTimeSetup || false);
+    }).catch(err => console.error(err));
+
     // Load second splash screen configuration
     getData('secondSplashConfig')
       .then((config) => {
@@ -43,12 +50,10 @@ export default function App() {
       setShowSecondSplash(false);
     }, 2000);
   }, []);
-  
+
   return (
- 
     <NavigationContainer>
       <Stack.Navigator>
-    
         {showSecondSplash && (
           <Stack.Screen name="SecondSplash" options={{ headerShown: false }}>
             {() => (
@@ -60,34 +65,47 @@ export default function App() {
           </Stack.Screen>
         )}
 
-        {/* Rest of the Screens */}
-        <Stack.Screen
-          name="Dashboard"
-          component={Dashboard}
-          options={(params) => ({
-            ...headerStyles,
-            title: 'CIC',
-            headerRight: () => (
-              <AddButton
-                title={'+ '}
-                onPress={() => params.navigation.navigate('Admin')}
-              />
-            ),
-          })}
-        />
-        <Stack.Screen
-          name="Admin"
-          component={Admin}
-          options={{ ...headerStyles, title: 'Admin' }}
-        />
-        <Stack.Screen
-          name="Questioner"
-          component={Questioner}
-          options={{ ...headerStyles, title: 'Questioner' }}
-        />
+        {!isFirstTimeSetup && !showSecondSplash && (
+          <Stack.Screen
+            name="Setup"
+            component={SetupScreen}
+            options={{
+              headerShown: false,
+              gestureEnabled: false, // Disable gestures during setup
+            }}
+          />
+        )}
+
+        {isFirstTimeSetup && !showSecondSplash && (
+          <>
+            <Stack.Screen
+              name="Dashboard"
+              component={Dashboard}
+              options={(params) => ({
+                ...headerStyles,
+                title: "Undefined",
+                headerRight: () => (
+                  <AddButton
+                    title={"+ "}
+                    onPress={() => params.navigation.navigate("Admin")}
+                  />
+                ),
+              })}
+            />
+            <Stack.Screen
+              name="Admin"
+              component={Admin}
+              options={{ ...headerStyles, title: "Admin" }}
+            />
+            <Stack.Screen
+              name="Questioner"
+              component={Questioner}
+              options={{ ...headerStyles, title: "Questioner" }}
+            />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
-
   );
 }
 
