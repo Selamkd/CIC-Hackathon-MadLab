@@ -55,10 +55,12 @@ const Admin = (props) => {
   };
 
   const removeQuestion = (question) => {
-    const updatedQuestions = selectedQuestions.filter(
-      (q) => q.id !== question.id
-    );
+    
+    const updatedQuestions = selectedQuestions.filter((q) => q.id !== question.id);
     setSelectedQuestions(updatedQuestions);
+
+    const updatedQuestionList = [...questionList, question];
+    setQuestionList(updatedQuestionList);
   };
 
   const renderQuestionItem = ( item ,func) => (
