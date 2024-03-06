@@ -39,28 +39,6 @@ export default function Dashboard({ navigation }) {
     };
   }, [navigation]);
 
-  const handleRemoveForm = (form) => {
-    Alert.alert(
-      'Think about it!',
-      `Do you really want to delete ${form.name || 'this'} form?`,
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: () => {
-            const forms = sessionForms.filter((x) => x.id != form.id);
-            setSessionForms(forms);
-            storeData('sessionForms', forms).catch((err) => console.log(err));
-          },
-        },
-      ]
-    );
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Sign up for a workshop</Text>
@@ -129,7 +107,8 @@ const styles = StyleSheet.create({
   },
 
   formContainer: {
-    position: 'relative',
+    // position: 'relative',
+    margin: 10,
   },
 
   iconShadow: {
