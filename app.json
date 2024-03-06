@@ -21,17 +21,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.muraminsav.cic"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "f45fed10-67cc-49dd-a5db-c15bc1e5270b"
       }
     },
-    "owner": "muraminsav"
+    "web": {
+
+      "favicon": "./assets/favicon.png"
+
+    }
   }
 }
