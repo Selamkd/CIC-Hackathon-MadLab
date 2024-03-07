@@ -11,7 +11,7 @@ import { getData, storeData } from '../utils/AsyncStorage';
 // import generateExcelFromJson from '../utils/Export';
 
 export default function Questioner({ route, navigation }) {
-  const payload = route.params?.payload.id;
+  const payload = route.params?.payload;
   const [formData, setFormData] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [responsStore, setResponeStore] = useState([]);
@@ -19,9 +19,10 @@ export default function Questioner({ route, navigation }) {
   useEffect(() => {
     const loadFormData = async () => {
       const forms = await getData('sessionForms');
+      console.log('questioner', forms, 'payload:', payload);
 
       if (forms && payload) {
-        const selectedForm = forms.find((form) => form.id === payload);
+        const selectedForm = forms.find((form) => form.id === payload.id);
         setFormData(selectedForm);
       }
     };
@@ -71,17 +72,18 @@ export default function Questioner({ route, navigation }) {
             }}
             onPressOut={() => {
               storeData('responseStore', responsStore).then(() => {
-                setAnswers({});
+                setAnswers(null);
                 setFormData(null);
                 console.log(answers);
               });
             }}
           >
-            <Text style={styles.submitButtonText}>Submit</Text>
+            <Text style={styles.submitButtonText}>save</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.submitButton}
+            onPress={() => console.log(responsStore)}
             // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
           >
             <Text style={styles.submitButtonText}>Submit</Text>
