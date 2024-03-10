@@ -15,6 +15,7 @@ export default function Questioner({ route, navigation }) {
   const [formData, setFormData] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [responsStore, setResponeStore] = useState([]);
+  const survayName = `${payload.name}-Survay`;
 
   useEffect(() => {
     const loadFormData = async () => {
@@ -30,7 +31,7 @@ export default function Questioner({ route, navigation }) {
     loadFormData();
   }, [payload, answers]);
   useEffect(() => {
-    getData('responseStore')
+    getData(`${payload.name}+Survay`)
       .then((data) => {
         data ? setResponeStore(data) : storeData('responseStore', []);
       })
@@ -68,13 +69,13 @@ export default function Questioner({ route, navigation }) {
             style={styles.submitButton}
             onPressIn={() => {
               setResponeStore([...responsStore, answers]);
-              console.log(responsStore);
+              console.log('save Response store', responsStore);
             }}
             onPressOut={() => {
               storeData('responseStore', responsStore).then(() => {
-                setAnswers(null);
-                setFormData(null);
-                console.log(answers);
+                setAnswers();
+                setFormData();
+                console.log('answers', responsStore);
               });
             }}
           >

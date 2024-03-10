@@ -10,6 +10,7 @@ import {
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { getData, storeData } from '../utils/AsyncStorage';
+import generateExcelFromJson from '../utils/Export';
 export default function DashboardIcon({
   title,
   navigation,
@@ -19,6 +20,7 @@ export default function DashboardIcon({
 }) {
   const [isLive, setIsLive] = useState(false);
   [sessionForms, setSessionForms] = session;
+
   const handleRemoveForm = (form) => {
     console.log(form);
     Alert.alert(
@@ -57,7 +59,18 @@ export default function DashboardIcon({
         {
           text: 'OK',
           onPress: () => {
-            setIsLive(false), Alert.alert(' ', 'Summary saved on the device.');
+            getData('responseStore')
+              .then((data) =>
+                generateExcelFromJson(data, form.name)
+                  .then((x) => {
+                    setIsLive(false),
+                      Alert.alert(`${x}`, 'Summary saved on the device.');
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  })
+              )
+              .catch((err) => console.log(err));
           },
         },
       ]
@@ -87,7 +100,7 @@ export default function DashboardIcon({
         {isLive && (
           <TouchableOpacity
             style={[styles.removeButton, styles.downloadBtn]}
-            onPress={() => DownloadForm(payload)}
+            onPress={() => DownloadForm(payload, payload.name)}
           >
             <Text style={styles.downloadLabel}>⤓</Text>
             <View style={styles.label}>
