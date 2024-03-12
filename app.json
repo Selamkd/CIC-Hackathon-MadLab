@@ -1,15 +1,14 @@
 {
   "expo": {
-    "name": "CIC",
-    "slug": "cic",
+    "name": "Custom Feedback App",
+    "slug": "Custom Feedback",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/CIC.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#51ad63"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -18,9 +17,8 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+      "Icon": {
+        "foregroundImage": "./assets/icon.png"
       }
     },
     "web": {

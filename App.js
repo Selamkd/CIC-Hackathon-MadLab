@@ -3,23 +3,23 @@ import { StyleSheet, Image, Text, View, ActivityIndicator, TouchableOpacity, Saf
 import { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {getData,storeData} from './utils/AsyncStorage';
+import { getData, storeData } from './utils/AsyncStorage';
 import questions from './utils/Questions';
 
 import Admin from "./screens/Admin"
 import Dashboard from "./screens/Dashboard"
 import Questioner from "./screens/Questioner"
 import SecondSplashScreen from './components/SecondSplashScreen';
-import SetupScreen from './screens/SetupScreen'
+import SetupScreen from './screens/SetupScreen';
 
 export default function App() {
   const Stack = createStackNavigator();
+
   useEffect(() => {
-    getData("questions").then(q=>{!q? storeData("questions", questions):null}).catch(err=>console.log(err))
-   
-  
+    getData("questions").then(q => {!q ? storeData("questions", questions) : null }).catch(err => console.log(err))
+
     return () => {
-     
+
     }
   }, [])
 
@@ -29,6 +29,8 @@ export default function App() {
     backgroundColor: '#51ad63',
     logo: 'your_logo_url_here',
   });
+
+  const [customCompanyName, setCustomCompanyName] = useState("Undefined");
 
   useEffect(() => {
     // Check if it's the first time setup
@@ -48,7 +50,15 @@ export default function App() {
     // Simulate a delay for the second splash screen
     setTimeout(() => {
       setShowSecondSplash(false);
-    }, 2000);
+    }, 3000);
+  }, []);
+
+  useEffect(() => {
+    getData('customCompanyName')
+      .then((companyName) => {
+        setCustomCompanyName(companyName || "Undefined");
+      })
+      .catch(err => console.error(err));
   }, []);
 
   return (
@@ -64,8 +74,36 @@ export default function App() {
             )}
           </Stack.Screen>
         )}
+        <>
+          <Stack.Screen
+            name="Dashboard"
+            component={Dashboard}
+            options={(params) => ({
+              ...headerStyles,
+              title: customCompanyName || "Undefined",
+              headerRight: () => (
+                <AddButton
+                  title={"+ "}
+                  onPress={() => params.navigation.navigate("Admin")}
+                />
+              ),
+            })}
+          />
+          <Stack.Screen
+            name="Admin"
+            component={Admin}
+            options={(params) => ({
+              ...headerStyles,
+              title: "Admin",
+              headerRight: () => (
+                <AddButton
+                  title={"+ "}
+                  onPress={() => params.navigation.navigate("Setup")}
+                />
+              ),
+            })}
+          />
 
-        {!isFirstTimeSetup && !showSecondSplash && (
           <Stack.Screen
             name="Setup"
             component={SetupScreen}
@@ -74,51 +112,29 @@ export default function App() {
               gestureEnabled: false, // Disable gestures during setup
             }}
           />
-        )}
-
-        {isFirstTimeSetup && !showSecondSplash && (
-          <>
-            <Stack.Screen
-              name="Dashboard"
-              component={Dashboard}
-              options={(params) => ({
-                ...headerStyles,
-                title: "Undefined",
-                headerRight: () => (
-                  <AddButton
-                    title={"+ "}
-                    onPress={() => params.navigation.navigate("Admin")}
-                  />
-                ),
-              })}
-            />
-            <Stack.Screen
-              name="Admin"
-              component={Admin}
-              options={{ ...headerStyles, title: "Admin" }}
-            />
-            <Stack.Screen
-              name="Questioner"
-              component={Questioner}
-              options={{ ...headerStyles, title: "Questioner" }}
-            />
-          </>
-        )}
+          <Stack.Screen
+            name="Questioner"
+            component={Questioner}
+            options={{ ...headerStyles, title: "Questioner" }}
+          />
+        </>
+      
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-function AddButton ({title, onPress}) {
+function AddButton({ title, onPress }) {
   return (
     <TouchableOpacity
-    style={styles.button}
-    onPress={onPress}
-    underlayColor='#fff'>
+      style={styles.button}
+      onPress={onPress}
+      underlayColor='#fff'>
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   )
 }
+
 export const headerStyles = {
   headerStyle: {
     elevation: 0,
@@ -138,10 +154,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  button:{
+  button: {
     backgroundColor: 'transparent',
   },
-  buttonText:{
+  buttonText: {
     fontSize: 30
   }
 });

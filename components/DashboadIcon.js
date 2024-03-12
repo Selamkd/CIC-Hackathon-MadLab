@@ -1,22 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import {
-  StyleSheet,
-  Image,
-  Text,
-  View,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import {StyleSheet, Image, Text, View, ActivityIndicator, Alert,} from 'react-native';
 import { useState, useEffect } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { getData, storeData } from '../utils/AsyncStorage';
+
+
 export default function DashboardIcon({
   title,
   navigation,
   payload,
   description,
-  session,
+session,
 }) {
+
   const [isLive, setIsLive] = useState(false);
   [sessionForms, setSessionForms] = session;
   const handleRemoveForm = (form) => {

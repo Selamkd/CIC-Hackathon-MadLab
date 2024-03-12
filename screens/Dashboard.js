@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Alert,
-} from 'react-native';
-import { getData, removeData, storeData } from '../utils/AsyncStorage';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { getData, storeData } from '../utils/AsyncStorage';
 import DashboardIcon from '../components/DashboadIcon';
 
-export default function Dashboard({ navigation }) {
+export default function Dashboard({ route, navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  const customCompanyName = route.params?.customCompanyName || 'Undefined';
 
   const loadSessionForms = async () => {
     const forms = await getData('sessionForms');
@@ -23,21 +19,18 @@ export default function Dashboard({ navigation }) {
 
   useEffect(() => {
     // Load session forms when the component mounts
-
     loadSessionForms();
 
     // Use event listener to refresh session forms when navigating back from Admin
-
     const unsubscribeFocus = navigation.addListener('focus', () => {
       loadSessionForms();
     });
 
     return () => {
       // Cleanup the event listener
-
       unsubscribeFocus();
     };
-  }, [navigation]);
+  }, [navigation, refresh]); // Include refresh in the dependency array
 
   const handleRemoveForm = (form) => {
     Alert.alert(
@@ -63,7 +56,7 @@ export default function Dashboard({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Sign up for a workshop</Text>
+      <Text style={styles.text}>Select the Session Form</Text>
 
       <View style={styles.iconList}>
         <FlatList
@@ -86,6 +79,7 @@ export default function Dashboard({ navigation }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

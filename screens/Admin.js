@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button, Alert } from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
-import { TextInput } from 'react-native-gesture-handler';
+import { demographicQuestions, generalSurveyQuestions } from '../utils/Questions';
 
 const Admin = (props) => {
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [sessionName, setSessionName] = useState('');
-  const [sessionDescription, setSessionDescription] = useState(''); // Added session description state
+  const [sessionDescription, setSessionDescription] = useState('');
   const [questionerList, setQuestionerList] = useState([]);
-  const [upteState, setUpdateStae] = useState(true);
+  const [updateState, setUpdateState] = useState(true);
+  const [isAdminPasswordSet, setIsAdminPasswordSet] = useState(true);
+  const [enteredPassword, setEnteredPassword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('demographic');
 
   useEffect(() => {
     getData('questions')
@@ -19,13 +22,34 @@ const Admin = (props) => {
     getData('sessionForms')
       .then((x) => (x ? setQuestionerList(x) : null))
       .catch((er) => console.log(er));
+
+    // Check if admin password is set
+    getData('isAdminPasswordSet')
+      .then((isSet) => {
+        setIsAdminPasswordSet(isSet || false);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
-  const updateState = (SN, QL) => {
+  useEffect(() => {
+    // Load questions based on the selected category
+    const loadQuestions = async () => {
+      try {
+        const categoryQuestions = selectedCategory === 'demographic' ? demographicQuestions : generalSurveyQuestions;
+        setQuestionList(categoryQuestions);
+      } catch (error) {
+        console.error('Error loading questions:', error);
+      }
+    };
+
+    loadQuestions();
+  }, [selectedCategory, updateState]);
+
+  const updateStateFunction = (SN, QL) => {
     const newQuestioner = {
       id: questionerList.length + 1,
       name: SN,
-      description: sessionDescription, // Include session description in the newQuestioner object
+      description: sessionDescription,
       created: new Date(Date.now()),
       questions: QL,
     };
@@ -33,7 +57,7 @@ const Admin = (props) => {
   };
 
   const handleSubmit = () => {
-    setUpdateStae(!upteState);
+    setUpdateState(!updateState);
     return storeData('sessionForms', questionerList)
       .then(() => props.navigation.navigate('Dashboard'))
       .catch((er) => console.log(er));
@@ -43,7 +67,6 @@ const Admin = (props) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
 
     if (!isDuplicate) {
-      // Remove the added question from questionList
       const updatedQuestionList = questionList.filter((q) => q.id !== question.id);
       setQuestionList(updatedQuestionList);
 
@@ -55,44 +78,78 @@ const Admin = (props) => {
   };
 
   const removeQuestion = (question) => {
-    // Remove the question from the selected questions
     const updatedQuestions = selectedQuestions.filter((q) => q.id !== question.id);
     setSelectedQuestions(updatedQuestions);
-  
-    // Add the removed question back to the available questions
+
     const updatedQuestionList = [...questionList, question];
     setQuestionList(updatedQuestionList);
   };
 
-  const renderQuestionItem = ( item ,func) => (
-    <TouchableOpacity
-      onPress={() => func(item)}
-      style={styles.questionItem}
-    >
+  const renderQuestionItem = (item, func) => (
+    <TouchableOpacity onPress={() => func(item)} style={styles.questionItem}>
       <Text>{item.text}</Text>
     </TouchableOpacity>
   );
+
+  const handlePasswordSubmit = () => {
+    getData('adminPassword')
+      .then((savedPassword) => {
+        if (enteredPassword === savedPassword) {
+          setEnteredPassword(''); // Clear entered password
+          setIsAdminPasswordSet(false); // Disable password protection once verified
+        } else {
+          Alert.alert('Incorrect password. Please try again.');
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // If admin password is set, render password input
+  if (isAdminPasswordSet) {
+    return (
+      <View style={styles.passwordContainer}>
+        <Text>Please enter the admin password:</Text>
+        <TextInput
+          secureTextEntry
+          value={enteredPassword}
+          onChangeText={setEnteredPassword}
+          style={styles.passwordInput}
+        />
+        <Button title="Submit" onPress={handlePasswordSubmit} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.listBlock}>
         <Text style={styles.heading}>Admin Interface</Text>
-
         <TextInput
           placeholder={'Session Name'}
           onChangeText={(e) => setSessionName(e)}
         />
-
-        {/* Added TextInput for Session Description */}
         <TextInput
           placeholder={'Session Description'}
           onChangeText={(e) => setSessionDescription(e)}
         />
-
+        <View style={styles.categoryButtons}>
+        <TouchableOpacity
+          style={[styles.categoryButton, { backgroundColor: selectedCategory === 'demographic' ? '#51ad63' : '#e6e6e6' }]}
+          onPress={() => setSelectedCategory('demographic')}
+        >
+          <Text style={styles.categoryButtonText}>Demographic Questions</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.categoryButton, { backgroundColor: selectedCategory === 'general' ? '#51ad63' : '#e6e6e6' }]}
+          onPress={() => setSelectedCategory('general')}
+        >
+          <Text style={styles.categoryButtonText}>General Survey Questions</Text>
+        </TouchableOpacity>
+        </View>
         <Text style={styles.subHeading}>Available Questions:</Text>
         <FlatList
           data={questionList}
-          renderItem={({item})=>renderQuestionItem(item, addQuestion)}
+          renderItem={({ item }) => renderQuestionItem(item, addQuestion)}
           keyExtractor={(item) => item.id.toString()}
         />
       </View>
@@ -100,15 +157,14 @@ const Admin = (props) => {
         <Text style={styles.subHeading}>Selected Questions:</Text>
         <FlatList
           data={selectedQuestions}
-          renderItem={({item})=>renderQuestionItem(item,removeQuestion)}
+          renderItem={({ item }) => renderQuestionItem(item, removeQuestion)}
           keyExtractor={(item) => item.id.toString()}
         />
       </View>
-
       <TouchableOpacity
         style={styles.submitButton}
         onPressOut={handleSubmit}
-        onPressIn={() => updateState(sessionName, selectedQuestions)}
+        onPressIn={() => updateStateFunction(sessionName, selectedQuestions)}
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
@@ -122,6 +178,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 20,
   },
+  passwordContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  passwordInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 10,
+    width: '80%',
+  },
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -133,16 +202,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
   },
+  listBlock: {
+    flex: 3,
+  },
   questionItem: {
     padding: 10,
     backgroundColor: '#e6e6e6',
-    marginBottom: 5,
-    borderRadius: 5,
-  },
-  selectedQuestionItem: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    marginBottom: 5,
+    marginBottom: 5, // Increase marginBottom to provide more space between questions
     borderRadius: 5,
   },
   submitButton: {
@@ -157,11 +223,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  listBlock: {
-    flex: 2,
-  },
   selectBlock: {
     flex: 2,
+  },
+  categoryButtons: {
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    margin: 10,
+  },
+  categoryButton: {
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+  },
+  categoryButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

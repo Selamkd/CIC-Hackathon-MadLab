@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity} from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
 // import generateExcelFromJson from '../utils/Export';
 
