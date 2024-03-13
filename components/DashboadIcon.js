@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   Alert,
+  // TouchableOpacity,
 } from 'react-native';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -59,12 +60,12 @@ export default function DashboardIcon({
         {
           text: 'OK',
           onPress: () => {
-            getData('responseStore')
+            getData(`${form.name}-Survay`)
               .then((data) =>
                 generateExcelFromJson(data, form.name)
                   .then((x) => {
-                    setIsLive(false),
-                      Alert.alert(`${x}`, 'Summary saved on the device.');
+                    // setIsLive(false);
+                    // Alert.alert(`${x}`, 'Summary saved on the device.');
                   })
                   .catch((err) => {
                     console.log(err);

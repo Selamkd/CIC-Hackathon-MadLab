@@ -18,13 +18,13 @@ export default generateExcelFromJson = (jsonData, name) => {
 
       // Prepare file path
       const filePath = FileFystem.documentDirectory + `${fileName}.xlsx`;
-
+      console.log(filePath);
       // Write the file
       FileFystem.writeAsStringAsync(filePath, wbout, {
         encoding: FileFystem.EncodingType.Base64,
       })
         .then(() => {
-          // resolve(filePath);
+          resolve(`${name}`);
           Sharing.shareAsync(filePath);
         })
         .catch((err) => {

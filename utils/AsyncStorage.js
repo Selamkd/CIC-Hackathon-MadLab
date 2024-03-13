@@ -21,7 +21,8 @@ const getData = async (key) => {
 const removeKeys = async (keys) => {
   //key = [key,key1]
   try {
-    const value = await AsyncStorage.multiRemove(keys, (err) => {
+    console.log(`Removing: ${keys}`);
+    await AsyncStorage.multiRemove(keys, (err) => {
       // keys k1 & k2 removed, if they existed
       // do most stuff after removal (if you want)
     });

@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { getData, storeData } from '../utils/AsyncStorage';
+import { getData, removeKeys, storeData } from '../utils/AsyncStorage';
 // import generateExcelFromJson from '../utils/Export';
 
 export default function Questioner({ route, navigation }) {
@@ -31,9 +31,9 @@ export default function Questioner({ route, navigation }) {
     loadFormData();
   }, [payload, answers]);
   useEffect(() => {
-    getData(`${payload.name}+Survay`)
+    getData(survayName)
       .then((data) => {
-        data ? setResponeStore(data) : storeData('responseStore', []);
+        data ? setResponeStore(data) : storeData(survayName, []);
       })
       .catch((er) => console.log(er));
   }, []);
@@ -69,25 +69,30 @@ export default function Questioner({ route, navigation }) {
             style={styles.submitButton}
             onPressIn={() => {
               setResponeStore([...responsStore, answers]);
-              console.log('save Response store', responsStore);
             }}
             onPressOut={() => {
-              storeData('responseStore', responsStore).then(() => {
+              storeData(survayName, responsStore).then(() => {
                 setAnswers();
                 setFormData();
-                console.log('answers', responsStore);
               });
             }}
           >
-            <Text style={styles.submitButtonText}>save</Text>
+            <Text style={styles.submitButtonText}>Save</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={() => console.log(responsStore)}
-            // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
+            onPress={() =>
+              removeKeys(['responseStore', survayName]).then(() => {
+                setAnswers();
+                setFormData();
+                setResponeStore();
+              })
+            }
           >
-            <Text style={styles.submitButtonText}>Submit</Text>
+            <Text style={styles.submitButtonText}>
+              Clear ${payload.name} survay data
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
