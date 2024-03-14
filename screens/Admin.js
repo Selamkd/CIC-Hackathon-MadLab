@@ -1,23 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  Button,
+  Alert,
+} from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
-import { demographicQuestions, generalSurveyQuestions } from '../utils/Questions';
+
+import { useAllQuestions } from '../components/context/AllQuestionsContext';
 
 const Admin = (props) => {
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+
   const [sessionName, setSessionName] = useState('');
   const [sessionDescription, setSessionDescription] = useState('');
   const [questionerList, setQuestionerList] = useState([]);
   const [updateState, setUpdateState] = useState(true);
   const [isAdminPasswordSet, setIsAdminPasswordSet] = useState(true);
   const [enteredPassword, setEnteredPassword] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('demographic');
+  const [categoryList, setCategoryList] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
+  const { state, dispatch } = useAllQuestions();
   useEffect(() => {
-    getData('questions')
-      .then((x) => setQuestionList(x))
-      .catch((er) => console.log(er));
+    setCategoryList(Object.keys(state));
+    setSelectedCategory(categoryList[0]);
 
     getData('sessionForms')
       .then((x) => (x ? setQuestionerList(x) : null))
@@ -31,19 +43,11 @@ const Admin = (props) => {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    // Load questions based on the selected category
-    const loadQuestions = async () => {
-      try {
-        const categoryQuestions = selectedCategory === 'demographic' ? demographicQuestions : generalSurveyQuestions;
-        setQuestionList(categoryQuestions);
-      } catch (error) {
-        console.error('Error loading questions:', error);
-      }
-    };
-
-    loadQuestions();
-  }, [selectedCategory, updateState]);
+  // useEffect(() => {
+  // Load questions based on the selected category
+  // selectedCategory ? loadQuestions() : null;
+  // console.log('Loading questions......', selectedCategory);
+  // }, [selectedCategory, updateState]);
 
   const updateStateFunction = (SN, QL) => {
     const newQuestioner = {
@@ -55,6 +59,15 @@ const Admin = (props) => {
     };
     setQuestionerList([...questionerList, newQuestioner]);
   };
+  // const loadQuestions = async () => {
+  //   try {
+  //     //const categoryQuestions = selectedCategory === 'demographic' ? demographicQuestions : generalSurveyQuestions;
+  //     console.log('useEfecte selecting category', selectedCategory);
+  //     setQuestionList(state[`${selectedCategory}`].questionList);
+  //   } catch (error) {
+  //     console.error('Error loading questions:', error);
+  //   }
+  // };
 
   const handleSubmit = () => {
     setUpdateState(!updateState);
@@ -67,7 +80,9 @@ const Admin = (props) => {
     const isDuplicate = selectedQuestions.some((q) => q.id === question.id);
 
     if (!isDuplicate) {
-      const updatedQuestionList = questionList.filter((q) => q.id !== question.id);
+      const updatedQuestionList = questionList.filter(
+        (q) => q.id !== question.id
+      );
       setQuestionList(updatedQuestionList);
 
       const updatedQuestions = [...selectedQuestions, question];
@@ -78,7 +93,9 @@ const Admin = (props) => {
   };
 
   const removeQuestion = (question) => {
-    const updatedQuestions = selectedQuestions.filter((q) => q.id !== question.id);
+    const updatedQuestions = selectedQuestions.filter(
+      (q) => q.id !== question.id
+    );
     setSelectedQuestions(updatedQuestions);
 
     const updatedQuestionList = [...questionList, question];
@@ -88,6 +105,23 @@ const Admin = (props) => {
   const renderQuestionItem = (item, func) => (
     <TouchableOpacity onPress={() => func(item)} style={styles.questionItem}>
       <Text>{item.text}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderCategoryItem = (name) => (
+    <TouchableOpacity
+      style={[
+        styles.categoryButton,
+        {
+          backgroundColor: selectedCategory === name ? '#51ad63' : '#e6e6e6',
+        },
+      ]}
+      onPress={() => {
+        setSelectedCategory(name);
+        setQuestionList(name.questionList);
+      }}
+    >
+      <Text style={styles.categoryButtonText}>{name['name']}</Text>
     </TouchableOpacity>
   );
 
@@ -133,18 +167,13 @@ const Admin = (props) => {
           onChangeText={(e) => setSessionDescription(e)}
         />
         <View style={styles.categoryButtons}>
-        <TouchableOpacity
-          style={[styles.categoryButton, { backgroundColor: selectedCategory === 'demographic' ? '#51ad63' : '#e6e6e6' }]}
-          onPress={() => setSelectedCategory('demographic')}
-        >
-          <Text style={styles.categoryButtonText}>Demographic Questions</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.categoryButton, { backgroundColor: selectedCategory === 'general' ? '#51ad63' : '#e6e6e6' }]}
-          onPress={() => setSelectedCategory('general')}
-        >
-          <Text style={styles.categoryButtonText}>General Survey Questions</Text>
-        </TouchableOpacity>
+          <FlatList
+            data={categoryList}
+            renderItem={({ item }) => {
+              return renderCategoryItem(state[item]);
+            }}
+            keyExtractor={({ index }, item) => `${index}+ ${item}`}
+          />
         </View>
         <Text style={styles.subHeading}>Available Questions:</Text>
         <FlatList

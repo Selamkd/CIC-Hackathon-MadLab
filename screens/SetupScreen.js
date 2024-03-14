@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import { storeData } from '../utils/AsyncStorage';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import { storeData, resetStorage } from '../utils/AsyncStorage';
 
 export default function SetupScreen({ navigation }) {
   const [companyName, setCompanyName] = useState('');
@@ -60,20 +67,35 @@ export default function SetupScreen({ navigation }) {
         <TouchableOpacity
           style={[
             styles.colorButton,
-            { backgroundColor: '#ffffff', borderColor: selectedColor === '#ffffff' ? '#51ad63' : 'transparent' },
+            {
+              backgroundColor: '#ffffff',
+              borderColor:
+                selectedColor === '#ffffff' ? '#51ad63' : 'transparent',
+            },
           ]}
           onPress={() => setSelectedColor('#ffffff')}
         />
         <TouchableOpacity
           style={[
             styles.colorButton,
-            { backgroundColor: '#000000', borderColor: selectedColor === '#000000' ? '#51ad63' : 'transparent' },
+            {
+              backgroundColor: '#000000',
+              borderColor:
+                selectedColor === '#000000' ? '#51ad63' : 'transparent',
+            },
           ]}
           onPress={() => setSelectedColor('#000000')}
         />
       </View>
 
       <Button title="Setup" onPress={handleSetup} />
+      <Button
+        title="RESET APP DATA"
+        onPress={() => {
+          resetStorage();
+          navigation.navigate('Dashboard', {});
+        }}
+      />
     </View>
   );
 }
