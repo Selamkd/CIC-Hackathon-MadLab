@@ -7,14 +7,17 @@ const AllQuestionsContext = createContext();
 
 const initialState = questions;
 export const AllQuestionsProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [allQuestionsState, dispatchAllQuestions] = useReducer(
+    reducer,
+    initialState
+  );
   useEffect(() => {
     const fetchData = async () => {
       try {
         const allQuestions = await getData('allQuestions');
-        console.log('getD', allQuestions.key ? true : false);
+
         if (allQuestions) {
-          dispatch({
+          dispatchAllQuestions({
             type: 'UPDATE',
             payload: allQuestions || initialState,
           });
@@ -30,17 +33,19 @@ export const AllQuestionsProvider = ({ children }) => {
     const saveData = async () => {
       try {
         console.log('saveing......');
-        await storeData('allQuestions', state);
+        await storeData('allQuestions', allQuestionsState);
       } catch (error) {
         console.log(error);
       }
     };
 
     saveData();
-  }, [state]);
+  }, [allQuestionsState]);
 
   return (
-    <AllQuestionsContext.Provider value={{ state, dispatch }}>
+    <AllQuestionsContext.Provider
+      value={{ allQuestionsState, dispatchAllQuestions }}
+    >
       {children}
     </AllQuestionsContext.Provider>
   );

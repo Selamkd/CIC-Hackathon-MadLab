@@ -19,7 +19,10 @@ import Dashboard from './screens/Dashboard';
 import Questioner from './screens/Questioner';
 import SecondSplashScreen from './components/SecondSplashScreen';
 import SetupScreen from './screens/SetupScreen';
-import { AllQuestionsProvider } from './components/context/AllQuestionsContext';
+import {
+  AllQuestionsProvider,
+  ConfigProvider,
+} from './components/context/AllContext';
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -80,64 +83,69 @@ export default function App() {
   ) : null;
   return (
     <AllQuestionsProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {showSecondSplash && (
-            <Stack.Screen name="SecondSplash" options={{ headerShown: false }}>
-              {() => (
-                <SecondSplashScreen
-                  backgroundColor={secondSplashConfig.backgroundColor}
-                  logo={secondSplashConfig.logo}
-                />
-              )}
-            </Stack.Screen>
-          )}
-          <>
-            <Stack.Screen
-              name="Dashboard"
-              component={Dashboard}
-              options={(params) => ({
-                ...headerStyles,
-                title: customCompanyName || 'Undefined',
-                headerRight: () => (
-                  <AddButton
-                    title={'+ '}
-                    onPress={() => params.navigation.navigate('Admin')}
+      <ConfigProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            {showSecondSplash && (
+              <Stack.Screen
+                name="SecondSplash"
+                options={{ headerShown: false }}
+              >
+                {() => (
+                  <SecondSplashScreen
+                    backgroundColor={secondSplashConfig.backgroundColor}
+                    logo={secondSplashConfig.logo}
                   />
-                ),
-              })}
-            />
-            <Stack.Screen
-              name="Admin"
-              component={Admin}
-              options={(params) => ({
-                ...headerStyles,
-                title: 'Admin',
-                headerRight: () => (
-                  <AddButton
-                    title={'⚙ '}
-                    onPress={() => params.navigation.navigate('Setup')}
-                  />
-                ),
-              })}
-            />
+                )}
+              </Stack.Screen>
+            )}
+            <>
+              <Stack.Screen
+                name="Dashboard"
+                component={Dashboard}
+                options={(params) => ({
+                  ...headerStyles,
+                  title: customCompanyName || 'Undefined',
+                  headerRight: () => (
+                    <AddButton
+                      title={'+ '}
+                      onPress={() => params.navigation.navigate('Admin')}
+                    />
+                  ),
+                })}
+              />
+              <Stack.Screen
+                name="Admin"
+                component={Admin}
+                options={(params) => ({
+                  ...headerStyles,
+                  title: 'Admin',
+                  headerRight: () => (
+                    <AddButton
+                      title={'⚙ '}
+                      onPress={() => params.navigation.navigate('Setup')}
+                    />
+                  ),
+                })}
+              />
 
-            <Stack.Screen
-              name="Setup"
-              component={SetupScreen}
-              options={{
-                headerShown: false,
-                gestureEnabled: false, // Disable gestures during setup
-              }}
-            />
-            <Stack.Screen
-              name="Questioner"
-              component={Questioner}
-              options={{ ...headerStyles, title: 'Questioner' }}
-            />
-          </>
-        </Stack.Navigator>
-      </NavigationContainer>
+              <Stack.Screen
+                name="Setup"
+                component={SetupScreen}
+                options={{
+                  headerShown: false,
+                  gestureEnabled: false, // Disable gestures during setup
+                }}
+              />
+              <Stack.Screen
+                name="Questioner"
+                component={Questioner}
+                options={{ ...headerStyles, title: 'Questioner' }}
+              />
+            </>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ConfigProvider>
     </AllQuestionsProvider>
   );
 }

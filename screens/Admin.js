@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
 
-import { useAllQuestions } from '../components/context/AllQuestionsContext';
+import { useAllQuestions, useConfig } from '../components/context/AllContext';
 
 const Admin = (props) => {
+  console.log(useConfig(), 'printibg config file .................');
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
@@ -26,9 +27,9 @@ const Admin = (props) => {
   const [categoryList, setCategoryList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  const { state, dispatch } = useAllQuestions();
+  const { allQuestionsState, dispatchAllQuestions } = useAllQuestions();
   useEffect(() => {
-    setCategoryList(Object.keys(state));
+    setCategoryList(Object.keys(allQuestionsState));
     setSelectedCategory(categoryList[0]);
 
     getData('sessionForms')
@@ -63,7 +64,7 @@ const Admin = (props) => {
   //   try {
   //     //const categoryQuestions = selectedCategory === 'demographic' ? demographicQuestions : generalSurveyQuestions;
   //     console.log('useEfecte selecting category', selectedCategory);
-  //     setQuestionList(state[`${selectedCategory}`].questionList);
+  //     setQuestionList(allQuestionsState[`${selectedCategory}`].questionList);
   //   } catch (error) {
   //     console.error('Error loading questions:', error);
   //   }
@@ -170,7 +171,7 @@ const Admin = (props) => {
           <FlatList
             data={categoryList}
             renderItem={({ item }) => {
-              return renderCategoryItem(state[item]);
+              return renderCategoryItem(allQuestionsState[item]);
             }}
             keyExtractor={({ index }, item) => `${index}+ ${item}`}
           />
