@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+  BackHandler,
+} from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
+import { useConfig } from '../components/context/AllContext';
 import DashboardIcon from '../components/DashboadIcon';
 
 export default function Dashboard({ route, navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true
+    );
 
-  const customCompanyName = route.params?.customCompanyName || 'Undefined';
+    return () => backHandler.remove();
+  }, []);
 
   const loadSessionForms = async () => {
     const forms = await getData('sessionForms');
@@ -79,7 +94,6 @@ export default function Dashboard({ route, navigation }) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

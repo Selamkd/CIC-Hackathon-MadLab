@@ -7,9 +7,12 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import { useConfig } from '../components/context/AllContext';
 import { storeData, resetStorage } from '../utils/AsyncStorage';
 
 export default function SetupScreen({ navigation }) {
+  const { stateConfig, dispatchConfig } = useConfig();
+
   const [companyName, setCompanyName] = useState('');
   const [splashScreen, setSplashScreen] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -23,16 +26,23 @@ export default function SetupScreen({ navigation }) {
     }
 
     // Store splash screen, admin password, and company name
-    storeData('customCompanyName', companyName);
-    storeData('customizedSecondSplash', splashScreen);
-    storeData('adminPassword', adminPassword);
-    storeData('isAdminPasswordSet', true);
-    storeData('customBackgroundColor', selectedColor); // Store background color
+    (stateConfig.customCompanyName = companyName),
+      (stateConfig.customizedSecondSplash = splashScreen),
+      (stateConfig.adminPassword = adminPassword),
+      (stateConfig.customBackgroundColor = selectedColor),
+      (stateConfig.isUserSet = true),
+      //   storeData('customCompanyName', companyName);
+      // storeData('customizedSecondSplash', splashScreen);
+      // storeData('adminPassword', adminPassword);
+      // storeData('isAdminPasswordSet', true);
+      // storeData('customBackgroundColor', selectedColor); // Store background color
 
-    // Set flag to indicate first-time setup is complete
-    storeData('isFirstTimeSetup', false);
+      // Set flag to indicate first-time setup is complete
+      // storeData('isFirstTimeSetup', false);
 
-    // Navigate to the main screen
+      // Navigate to the main screen
+      console.log('sromSetup', stateConfig);
+    dispatchConfig({ type: 'UPDATE', payload: stateConfig });
     navigation.navigate('Dashboard', {
       customCompanyName: companyName,
       adminPasswordSet: Boolean(adminPassword),
@@ -93,7 +103,7 @@ export default function SetupScreen({ navigation }) {
         title="RESET APP DATA"
         onPress={() => {
           resetStorage();
-          navigation.navigate('Dashboard', {});
+          navigation.navigate('Dashboard');
         }}
       />
     </View>

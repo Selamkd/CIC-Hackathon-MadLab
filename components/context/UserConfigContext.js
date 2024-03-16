@@ -1,20 +1,21 @@
 import React, { createContext, useEffect, useReducer, useContext } from 'react';
 import reducer from '../ContextReducer';
-import { questions } from '../../utils/Questions';
 import { getData, storeData, resetStorage } from '../../utils/AsyncStorage';
 
-const ConfigContext = createContext();
+const UserConfigContext = createContext();
 
 const initialState = {
-  customCompanyName: null,
+  customCompanyName: 'Your Business',
   customizedSecondSplash: null,
   adminPassword: null,
-  isAdminPasswordSet: false,
-  customBackgroundColor: null,
+  customBackgroundColor: '#000005',
+  isUserSet: false,
 };
 
-export const ConfigProvider = ({ children }) => {
+export const UserConfigProvider = ({ children }) => {
   const [stateConfig, dispatchConfig] = useReducer(reducer, initialState);
+
+  //Update Global state from AsyncStore
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,11 +24,11 @@ export const ConfigProvider = ({ children }) => {
         if (config) {
           dispatchConfig({
             type: 'UPDATE',
-            payload: config || initialState,
+            payload: config,
           });
         }
       } catch (error) {
-        console.log('ConfigContext error Fetching data: ', error);
+        console.log('UserConfigContext error Fetching data: ', error);
       }
     };
     fetchData();
@@ -46,10 +47,10 @@ export const ConfigProvider = ({ children }) => {
   }, [stateConfig]);
 
   return (
-    <ConfigContext.Provider value={{ stateConfig, dispatchConfig }}>
+    <UserConfigContext.Provider value={{ stateConfig, dispatchConfig }}>
       {children}
-    </ConfigContext.Provider>
+    </UserConfigContext.Provider>
   );
 };
 
-export const useConfig = () => useContext(ConfigContext);
+export const useConfig = () => useContext(UserConfigContext);

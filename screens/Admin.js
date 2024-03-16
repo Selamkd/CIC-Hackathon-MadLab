@@ -11,23 +11,33 @@ import {
 } from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
 
-import { useAllQuestions, useConfig } from '../components/context/AllContext';
+import {
+  useAllQuestions,
+  useConfig,
+  useAccessControll,
+} from '../components/context/AllContext';
 
 const Admin = (props) => {
-  console.log(useConfig(), 'printibg config file .................');
   const [questionList, setQuestionList] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
-
   const [sessionName, setSessionName] = useState('');
   const [sessionDescription, setSessionDescription] = useState('');
   const [questionerList, setQuestionerList] = useState([]);
   const [updateState, setUpdateState] = useState(true);
-  const [isAdminPasswordSet, setIsAdminPasswordSet] = useState(true);
+  const [isAdminPasswordSet, setIsAdminPasswordSet] = useState(false);
   const [enteredPassword, setEnteredPassword] = useState('');
   const [categoryList, setCategoryList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const { allQuestionsState, dispatchAllQuestions } = useAllQuestions();
+  const { stateConfig } = useConfig();
+  console.log(
+    '.............',
+    useAllQuestions(),
+    useConfig(),
+    useAccessControll(),
+    'Admin'
+  );
   useEffect(() => {
     setCategoryList(Object.keys(allQuestionsState));
     setSelectedCategory(categoryList[0]);
@@ -37,11 +47,11 @@ const Admin = (props) => {
       .catch((er) => console.log(er));
 
     // Check if admin password is set
-    getData('isAdminPasswordSet')
-      .then((isSet) => {
-        setIsAdminPasswordSet(isSet || false);
-      })
-      .catch((err) => console.log(err));
+    // getData('isAdminPasswordSet')
+    //   .then((isSet) => {
+    //     setIsAdminPasswordSet(isSet || false);
+    //   })
+    //   .catch((err) => console.log(err));
   }, []);
 
   // useEffect(() => {
@@ -127,16 +137,14 @@ const Admin = (props) => {
   );
 
   const handlePasswordSubmit = () => {
-    getData('adminPassword')
-      .then((savedPassword) => {
-        if (enteredPassword === savedPassword) {
-          setEnteredPassword(''); // Clear entered password
-          setIsAdminPasswordSet(false); // Disable password protection once verified
-        } else {
-          Alert.alert('Incorrect password. Please try again.');
-        }
-      })
-      .catch((err) => console.log(err));
+    const password = stateConfig.adminPassword;
+
+    if (enteredPassword === password) {
+      setEnteredPassword(''); // Clear entered password
+      setIsAdminPasswordSet(false); // Disable password protection once verified
+    } else {
+      Alert.alert('Incorrect password. Please try again.');
+    }
   };
 
   // If admin password is set, render password input

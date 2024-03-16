@@ -11,9 +11,7 @@ import {
 import { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { getData, storeData } from './utils/AsyncStorage';
-import { questions } from './utils/Questions';
-
+import ApplicationStartingPoint from './ApplicationStaringPoint';
 import Admin from './screens/Admin';
 import Dashboard from './screens/Dashboard';
 import Questioner from './screens/Questioner';
@@ -21,132 +19,106 @@ import SecondSplashScreen from './components/SecondSplashScreen';
 import SetupScreen from './screens/SetupScreen';
 import {
   AllQuestionsProvider,
-  ConfigProvider,
+  UserConfigProvider,
+  AccessControllProvider,
+  useConfig,
 } from './components/context/AllContext';
+import { getData } from './utils/AsyncStorage';
 
 export default function App() {
-  const Stack = createStackNavigator();
-  const [loading, setLoading] = useState(false);
+  // const Stack = createStackNavigator();
+
+  // const [companyName, setCompanyName] = useState();
+  // const [isUserSet, setIsUserSet] = useState(false);
+  // const [showSecondSplash, setShowSecondSplash] = useState(true);
+
   // useEffect(() => {
-  //   getData('questions')
-  //     .then((q) => {
-  //       q ? null : storeData('questions', questions);
-  //     })
-  //     .then(() => setLoading(false))
-  //     .catch((err) => console.log(err));
+  //   // Simulate a delay for the second splash screen
+  //   const loadConfig = async () => {
+  //     try {
+  //       const config = await getData('config');
+  //       console.log(config);
+  //       setCompanyName(config.customCompanyName);
+  //       setIsUserSet(config.isUserSet);
+  //     } catch (error) {
+  //       console.log('Error loading Conig ..');
+  //     }
+  //   };
+  //   loadConfig();
+
+  //   setTimeout(() => {
+  //     setShowSecondSplash(false);
+  //   }, 2000);
+
+  //   return () => {};
   // }, []);
-
-  const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
-  const [showSecondSplash, setShowSecondSplash] = useState(true);
-  const [secondSplashConfig, setSecondSplashConfig] = useState({
-    backgroundColor: '#51ad63',
-    logo: 'your_logo_url_here',
-  });
-
-  const [customCompanyName, setCustomCompanyName] = useState('Undefined');
-
-  useEffect(() => {
-    // Check if it's the first time setup
-    getData('isFirstTimeSetup')
-      .then((firstTimeSetup) => {
-        setIsFirstTimeSetup(firstTimeSetup || false);
-      })
-      .catch((err) => console.error(err));
-
-    // Load second splash screen configuration
-    getData('secondSplashConfig')
-      .then((config) => {
-        if (config) {
-          setSecondSplashConfig(config);
-        }
-      })
-      .catch((err) => console.log(err));
-
-    // Simulate a delay for the second splash screen
-    setTimeout(() => {
-      setShowSecondSplash(false);
-    }, 3000);
-  }, []);
-
-  useEffect(() => {
-    getData('customCompanyName')
-      .then((companyName) => {
-        setCustomCompanyName(companyName || 'Undefined');
-      })
-      .catch((err) => console.error(err));
-  }, []);
-  console.log(loading);
-  loading ? (
-    <View>
-      <Text>Loading</Text>
-    </View>
-  ) : null;
   return (
-    <AllQuestionsProvider>
-      <ConfigProvider>
-        <NavigationContainer>
-          <Stack.Navigator>
-            {showSecondSplash && (
-              <Stack.Screen
-                name="SecondSplash"
-                options={{ headerShown: false }}
-              >
-                {() => (
-                  <SecondSplashScreen
-                    backgroundColor={secondSplashConfig.backgroundColor}
-                    logo={secondSplashConfig.logo}
+    <UserConfigProvider>
+      <AllQuestionsProvider>
+        <AccessControllProvider>
+          <ApplicationStartingPoint />
+          {/* <StatusBar /> */}
+          {/* <NavigationContainer>
+            {showSecondSplash ? (
+              <SecondSplashScreen />
+            ) : (
+              <Stack.Navigator>
+                <>
+                  <Stack.Screen
+                    name="Dashboard"
+                    component={Dashboard}
+                    options={(params) => {
+                      return {
+                        ...headerStyles,
+                        title: companyName,
+                        headerRight: () => (
+                          <AddButton
+                            title={'+ '}
+                            onPress={() =>
+                              isUserSet
+                                ? params.navigation.navigate('Admin')
+                                : params.navigation.navigate('Setup')
+                            }
+                          />
+                        ),
+                      };
+                    }}
                   />
-                )}
-              </Stack.Screen>
-            )}
-            <>
-              <Stack.Screen
-                name="Dashboard"
-                component={Dashboard}
-                options={(params) => ({
-                  ...headerStyles,
-                  title: customCompanyName || 'Undefined',
-                  headerRight: () => (
-                    <AddButton
-                      title={'+ '}
-                      onPress={() => params.navigation.navigate('Admin')}
-                    />
-                  ),
-                })}
-              />
-              <Stack.Screen
-                name="Admin"
-                component={Admin}
-                options={(params) => ({
-                  ...headerStyles,
-                  title: 'Admin',
-                  headerRight: () => (
-                    <AddButton
-                      title={'⚙ '}
-                      onPress={() => params.navigation.navigate('Setup')}
-                    />
-                  ),
-                })}
-              />
+                  <Stack.Screen
+                    name="Admin"
+                    component={Admin}
+                    options={(params) => ({
+                      ...headerStyles,
+                      title: 'Admin',
+                      headerRight: () => (
+                        <AddButton
+                          title={'⚙ '}
+                          onPress={() => params.navigation.navigate('Setup')}
+                        />
+                      ),
+                    })}
+                  />
 
-              <Stack.Screen
-                name="Setup"
-                component={SetupScreen}
-                options={{
-                  headerShown: false,
-                  gestureEnabled: false, // Disable gestures during setup
-                }}
-              />
-              <Stack.Screen
-                name="Questioner"
-                component={Questioner}
-                options={{ ...headerStyles, title: 'Questioner' }}
-              />
-            </>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ConfigProvider>
-    </AllQuestionsProvider>
+                  <Stack.Screen
+                    name="Setup"
+                    component={SetupScreen}
+                    options={{
+                      headerShown: false,
+                      gestureEnabled: false, // Disable gestures during setup
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Questioner"
+                    component={Questioner}
+                    options={{ ...headerStyles, title: 'Questioner' }}
+                  />
+                </>
+              </Stack.Navigator>
+            )}
+          </NavigationContainer> */}
+        </AccessControllProvider>
+      </AllQuestionsProvider>
+    </UserConfigProvider>
   );
 }
 

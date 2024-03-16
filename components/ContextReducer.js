@@ -3,10 +3,10 @@
 const reducer = (state, action) => {
   switch (action.type) {
     case 'UPDATE':
-      const newData = action.payload;
+      const newState = action.payload;
 
       return {
-        ...newData,
+        ...newState,
       };
     case 'DELETE':
       //   const newState = state.filter((item) => item !== action.payload);

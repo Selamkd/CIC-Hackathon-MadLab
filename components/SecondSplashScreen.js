@@ -1,35 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
-import { getData } from '../utils/AsyncStorage';
+import { View, Image, Text, StyleSheet, BackHandler } from 'react-native';
+import { useConfig } from './context/AllContext';
 
-const SecondSplashScreen = () => {
+const SecondSplashScreen = ({ navigation }) => {
+  const { stateConfig } = useConfig();
   const [splashScreenUrl, setSplashScreenUrl] = useState('');
-  const [companyName, setCompanyName] = useState('Undefined');
-  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  const [backgroundColor, setBackgroundColor] = useState('');
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const url = await getData('customizedSecondSplash');
-        if (url) {
-          setSplashScreenUrl(url);
-        }
+    setSplashScreenUrl(stateConfig.customizedSecondSplash);
+    setBackgroundColor(stateConfig.customBackgroundColor);
+    // Simulate a delay for the second splash scree
 
-        const storedCompanyName = await getData('customCompanyName');
-        if (storedCompanyName) {
-          setCompanyName(storedCompanyName);
-        }
-
-        const storedBackgroundColor = await getData('customBackgroundColor');
-        if (storedBackgroundColor) {
-          setBackgroundColor(storedBackgroundColor);
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
+    setTimeout(() => {
+      navigation.navigate('Dashboard');
+    }, 2000);
+    return () => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Dashboard' }],
+      });
     };
-
-    loadData();
   }, []);
 
   const getTextColor = () => {
@@ -43,7 +34,17 @@ const SecondSplashScreen = () => {
       {splashScreenUrl ? (
         <>
           <Image source={{ uri: splashScreenUrl }} style={styles.logo} />
-          <Text style={[styles.text, { color: getTextColor() }]}>{companyName}</Text>
+          <Text
+            style={[
+              styles.text,
+              {
+                color: 'Black',
+                // getTextColor()
+              },
+            ]}
+          >
+            {/* {stateConfig.customCompanyName} */}
+          </Text>
         </>
       ) : (
         <Text style={styles.loadingText}>Loading...</Text>

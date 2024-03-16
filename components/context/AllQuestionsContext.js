@@ -32,7 +32,7 @@ export const AllQuestionsProvider = ({ children }) => {
   useEffect(() => {
     const saveData = async () => {
       try {
-        console.log('saveing......');
+        console.log('saveing......config');
         await storeData('allQuestions', allQuestionsState);
       } catch (error) {
         console.log(error);
