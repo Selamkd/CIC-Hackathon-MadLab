@@ -1,6 +1,7 @@
 // import { useReducer } from "react";
 
 const reducer = (state, action) => {
+  console.log('reducer logs : state:', state, 'action:', { ...action });
   switch (action.type) {
     case 'UPDATE':
       const newState = action.payload;
@@ -8,10 +9,12 @@ const reducer = (state, action) => {
       return {
         ...newState,
       };
-    case 'DELETE':
+
+    case 'SET_FIRST_APP_LOAD':
       //   const newState = state.filter((item) => item !== action.payload);
       return {
-        // ...newState,
+        ...state,
+        firstLoad: action.payload,
       };
     default:
       return state;

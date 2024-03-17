@@ -31,16 +31,11 @@ const Admin = (props) => {
 
   const { allQuestionsState, dispatchAllQuestions } = useAllQuestions();
   const { stateConfig } = useConfig();
-  console.log(
-    '.............',
-    useAllQuestions(),
-    useConfig(),
-    useAccessControll(),
-    'Admin'
-  );
+
   useEffect(() => {
     setCategoryList(Object.keys(allQuestionsState));
     setSelectedCategory(categoryList[0]);
+    setIsAdminPasswordSet(stateConfig.isUserSet);
 
     getData('sessionForms')
       .then((x) => (x ? setQuestionerList(x) : null))

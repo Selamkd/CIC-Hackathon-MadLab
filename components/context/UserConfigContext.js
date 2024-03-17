@@ -1,49 +1,34 @@
-import React, { createContext, useEffect, useReducer, useContext } from 'react';
+import React, {
+  createContext,
+  useEffect,
+  useReducer,
+  useContext,
+  useState,
+  useMemo,
+} from 'react';
 import reducer from '../ContextReducer';
 import { getData, storeData, resetStorage } from '../../utils/AsyncStorage';
 
+import { fetchData, saveData } from '../../utils/ContextHelper';
 const UserConfigContext = createContext();
-
 const initialState = {
   customCompanyName: 'Your Business',
   customizedSecondSplash: null,
   adminPassword: null,
   customBackgroundColor: '#000005',
   isUserSet: false,
+  firstLoad: true,
 };
 
 export const UserConfigProvider = ({ children }) => {
+  // const [isFirstLoad, setIsFirsLoad] = useState(true);
   const [stateConfig, dispatchConfig] = useReducer(reducer, initialState);
-
   //Update Global state from AsyncStore
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const config = await getData('config');
-
-        if (config) {
-          dispatchConfig({
-            type: 'UPDATE',
-            payload: config,
-          });
-        }
-      } catch (error) {
-        console.log('UserConfigContext error Fetching data: ', error);
-      }
-    };
-    fetchData();
+    fetchData('config', initialState, dispatchConfig);
   }, []);
-
   useEffect(() => {
-    const saveData = async () => {
-      try {
-        await storeData('config', stateConfig);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    saveData();
+    saveData('config', stateConfig);
   }, [stateConfig]);
 
   return (

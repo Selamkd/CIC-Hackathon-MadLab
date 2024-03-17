@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, Text, StyleSheet, BackHandler } from 'react-native';
 import { useConfig } from './context/AllContext';
 
-const SecondSplashScreen = ({ navigation }) => {
+const SecondSplashScreen = ({ navigation, route }) => {
   const { stateConfig } = useConfig();
   const [splashScreenUrl, setSplashScreenUrl] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('');
@@ -10,18 +10,11 @@ const SecondSplashScreen = ({ navigation }) => {
   useEffect(() => {
     setSplashScreenUrl(stateConfig.customizedSecondSplash);
     setBackgroundColor(stateConfig.customBackgroundColor);
-    // Simulate a delay for the second splash scree
-
+    // Simulate a delay for the second splash scre
     setTimeout(() => {
       navigation.navigate('Dashboard');
-    }, 2000);
-    return () => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Dashboard' }],
-      });
-    };
-  }, []);
+    }, 2500);
+  }, [stateConfig]);
 
   const getTextColor = () => {
     // Determine text color based on background color
@@ -38,12 +31,11 @@ const SecondSplashScreen = ({ navigation }) => {
             style={[
               styles.text,
               {
-                color: 'Black',
-                // getTextColor()
+                color: getTextColor(),
               },
             ]}
           >
-            {/* {stateConfig.customCompanyName} */}
+            {stateConfig.customCompanyName}
           </Text>
         </>
       ) : (

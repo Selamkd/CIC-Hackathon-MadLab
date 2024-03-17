@@ -43,9 +43,8 @@ export default function SetupScreen({ navigation }) {
       // Navigate to the main screen
       console.log('sromSetup', stateConfig);
     dispatchConfig({ type: 'UPDATE', payload: stateConfig });
-    navigation.navigate('Dashboard', {
-      customCompanyName: companyName,
-      adminPasswordSet: Boolean(adminPassword),
+    navigation.navigate('SecondSplashScreen', {
+      ...stateConfig,
     });
   };
 

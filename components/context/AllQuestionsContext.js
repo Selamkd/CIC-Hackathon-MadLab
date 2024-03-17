@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useReducer, useContext } from 'react';
 import reducer from '../ContextReducer';
 import { questions } from '../../utils/Questions';
 import { getData, storeData, resetStorage } from '../../utils/AsyncStorage';
+import { fetchData, saveData } from '../../utils/ContextHelper';
 
 const AllQuestionsContext = createContext();
 
@@ -12,34 +13,11 @@ export const AllQuestionsProvider = ({ children }) => {
     initialState
   );
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const allQuestions = await getData('allQuestions');
-
-        if (allQuestions) {
-          dispatchAllQuestions({
-            type: 'UPDATE',
-            payload: allQuestions || initialState,
-          });
-        }
-      } catch (error) {
-        console.log('AllQuestionsContext error Fetching data: ', error);
-      }
-    };
-    fetchData();
+    fetchData('allQuestions', initialState, dispatchAllQuestions);
   }, []);
 
   useEffect(() => {
-    const saveData = async () => {
-      try {
-        console.log('saveing......config');
-        await storeData('allQuestions', allQuestionsState);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    saveData();
+    saveData('allQuestions', allQuestionsState);
   }, [allQuestionsState]);
 
   return (

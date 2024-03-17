@@ -1,4 +1,5 @@
 const questions = {
+  firstLoad: true,
   demographicQuestions: {
     name: 'Demographic Survay',
     questionList: [

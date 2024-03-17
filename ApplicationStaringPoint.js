@@ -28,9 +28,10 @@ export default function ApplicationStartingPoint() {
       <Stack.Navigator>
         <>
           <Stack.Screen
-            name={'SecondSplashSreen'}
+            name={'SecondSplashScreen'}
             component={SecondSplashScreen}
             options={{ headerShown: false }}
+            initialParams={stateConfig}
           />
 
           <Stack.Screen
