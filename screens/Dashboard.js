@@ -9,36 +9,32 @@ import {
   BackHandler,
 } from 'react-native';
 import { getData, storeData } from '../utils/AsyncStorage';
-import { useConfig } from '../components/context/AllContext';
+import { useConfig, useSurvayList } from '../components/context/AllContext';
 import DashboardIcon from '../components/DashboadIcon';
 
 export default function Dashboard({ route, navigation }) {
   const [sessionForms, setSessionForms] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const { stateSurvayList } = useSurvayList();
+  const loadSessionForms = () => {
+    setSessionForms(stateSurvayList.data);
+  };
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       () => true
     );
-
     return () => backHandler.remove();
   }, []);
 
-  const loadSessionForms = async () => {
-    const forms = await getData('sessionForms');
-
-    if (forms) {
-      setSessionForms(forms);
-    }
-  };
-
   useEffect(() => {
-    // Load session forms when the component mounts
     loadSessionForms();
+    // Load session forms when the component mounts
 
     // Use event listener to refresh session forms when navigating back from Admin
     const unsubscribeFocus = navigation.addListener('focus', () => {
       loadSessionForms();
+      setRefresh(!refresh);
     });
 
     return () => {
@@ -47,27 +43,27 @@ export default function Dashboard({ route, navigation }) {
     };
   }, [navigation, refresh]); // Include refresh in the dependency array
 
-  const handleRemoveForm = (form) => {
-    Alert.alert(
-      'Think about it!',
-      `Do you really want to delete ${form.name || 'this'} form?`,
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: () => {
-            const forms = sessionForms.filter((x) => x.id != form.id);
-            setSessionForms(forms);
-            storeData('sessionForms', forms).catch((err) => console.log(err));
-          },
-        },
-      ]
-    );
-  };
+  // const handleRemoveForm = (form) => {
+  //   Alert.alert(
+  //     'Think about it!',
+  //     `Do you really want to delete ${form.name || 'this'} form?`,
+  //     [
+  //       {
+  //         text: 'Cancel',
+  //         onPress: () => console.log('Cancel Pressed'),
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'OK',
+  //         onPress: () => {
+  //           const forms = sessionForms.filter((x) => x.id != form.id);
+  //           setSessionForms(forms);
+  //           storeData('sessionForms', forms).catch((err) => console.log(err));
+  //         },
+  //       },
+  //     ]
+  //   );
+  // };
 
   return (
     <View style={styles.container}>

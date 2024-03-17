@@ -1,11 +1,9 @@
 import React, { createContext, useEffect, useReducer, useContext } from 'react';
-import reducer from '../ContextReducer';
-import { questions } from '../../utils/Questions';
-import { getData, storeData, resetStorage } from '../../utils/AsyncStorage';
 import { fetchData, saveData } from '../../utils/ContextHelper';
+import { questions } from '../../utils/Questions';
+import reducer from '../ContextReducer';
 
 const AllQuestionsContext = createContext();
-
 const initialState = questions;
 export const AllQuestionsProvider = ({ children }) => {
   const [allQuestionsState, dispatchAllQuestions] = useReducer(

@@ -10,6 +10,7 @@ import {
 import { useState, useEffect } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { getData, storeData } from '../utils/AsyncStorage';
+import { useSurvayList } from './context/AllContext';
 
 export default function DashboardIcon({
   title,
@@ -18,9 +19,10 @@ export default function DashboardIcon({
   description,
   session,
 }) {
-  console.log('dashhhhboard!!..');
   const [isLive, setIsLive] = useState(false);
+  const { dispatchSurvayList } = useSurvayList();
   [sessionForms, setSessionForms] = session;
+
   const handleRemoveForm = (form) => {
     Alert.alert(
       'Think about it!',
@@ -36,7 +38,11 @@ export default function DashboardIcon({
           onPress: () => {
             const forms = sessionForms.filter((x) => x.id != form.id);
             setSessionForms(forms);
-            storeData('sessionForms', forms).catch((err) => console.log(err));
+            dispatchSurvayList({
+              type: 'UPDATE',
+              payload: { data: [...forms] },
+            });
+            // storeData('sessionForms', forms).catch((err) => console.log(err));
           },
         },
       ]

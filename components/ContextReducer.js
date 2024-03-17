@@ -7,6 +7,7 @@ const reducer = (state, action) => {
       const newState = action.payload;
 
       return {
+        ...state,
         ...newState,
       };
 

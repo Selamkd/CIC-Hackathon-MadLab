@@ -9,12 +9,12 @@ import {
   Button,
   Alert,
 } from 'react-native';
-import { getData, storeData } from '../utils/AsyncStorage';
 
 import {
   useAllQuestions,
   useConfig,
   useAccessControll,
+  useSurvayList,
 } from '../components/context/AllContext';
 
 const Admin = (props) => {
@@ -29,25 +29,20 @@ const Admin = (props) => {
   const [categoryList, setCategoryList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  const { allQuestionsState, dispatchAllQuestions } = useAllQuestions();
+  const { allQuestionsState } = useAllQuestions();
   const { stateConfig } = useConfig();
+  const { stateSurvayList, dispatchSurvayList } = useSurvayList();
 
   useEffect(() => {
-    setCategoryList(Object.keys(allQuestionsState));
+    setCategoryList(
+      Object.keys(allQuestionsState).filter((item) => {
+        return typeof allQuestionsState[item] === 'object';
+      })
+    );
     setSelectedCategory(categoryList[0]);
     setIsAdminPasswordSet(stateConfig.isUserSet);
-
-    getData('sessionForms')
-      .then((x) => (x ? setQuestionerList(x) : null))
-      .catch((er) => console.log(er));
-
-    // Check if admin password is set
-    // getData('isAdminPasswordSet')
-    //   .then((isSet) => {
-    //     setIsAdminPasswordSet(isSet || false);
-    //   })
-    //   .catch((err) => console.log(err));
-  }, []);
+    setQuestionerList(stateSurvayList.data);
+  }, [updateState]);
 
   // useEffect(() => {
   // Load questions based on the selected category
@@ -55,15 +50,18 @@ const Admin = (props) => {
   // console.log('Loading questions......', selectedCategory);
   // }, [selectedCategory, updateState]);
 
-  const updateStateFunction = (SN, QL) => {
+  const updateStateFunction = (sessionName, sessionDesc, questionList) => {
     const newQuestioner = {
       id: questionerList.length + 1,
-      name: SN,
-      description: sessionDescription,
+      name: sessionName,
+      description: sessionDesc,
       created: new Date(Date.now()),
-      questions: QL,
+      questions: questionList,
     };
     setQuestionerList([...questionerList, newQuestioner]);
+    setSessionName('');
+    setSessionDescription('');
+    setSelectedQuestions([]);
   };
   // const loadQuestions = async () => {
   //   try {
@@ -76,10 +74,12 @@ const Admin = (props) => {
   // };
 
   const handleSubmit = () => {
-    setUpdateState(!updateState);
-    return storeData('sessionForms', questionerList)
-      .then(() => props.navigation.navigate('Dashboard'))
-      .catch((er) => console.log(er));
+    // setUpdateState(!updateState);
+    props.navigation.navigate('Dashboard');
+    return dispatchSurvayList({
+      type: 'UPDATE',
+      payload: { data: [...questionerList] },
+    });
   };
 
   const addQuestion = (question) => {
@@ -197,7 +197,13 @@ const Admin = (props) => {
       <TouchableOpacity
         style={styles.submitButton}
         onPressOut={handleSubmit}
-        onPressIn={() => updateStateFunction(sessionName, selectedQuestions)}
+        onPressIn={() =>
+          updateStateFunction(
+            sessionName,
+            sessionDescription,
+            selectedQuestions
+          )
+        }
       >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>

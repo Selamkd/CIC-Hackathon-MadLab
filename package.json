@@ -24,6 +24,7 @@
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-web": "~0.19.6",
+    "uuid": "^9.0.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
