@@ -3,7 +3,7 @@ import reducer from '../ContextReducer';
 import { fetchData, saveData } from '../../utils/ContextHelper';
 const SurvayLogContext = createContext();
 const initialState = {
-  data: [],
+  data: {},
   firstLoad: true,
 };
 

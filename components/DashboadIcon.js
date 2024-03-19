@@ -73,7 +73,6 @@ export default function DashboardIcon({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     // position: 'absolute',

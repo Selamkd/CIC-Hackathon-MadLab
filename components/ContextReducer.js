@@ -5,7 +5,6 @@ const reducer = (state, action) => {
   switch (action.type) {
     case 'UPDATE':
       const newState = action.payload;
-
       return {
         ...state,
         ...newState,

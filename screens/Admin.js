@@ -55,7 +55,7 @@ const Admin = (props) => {
       id: questionerList.length + 1,
       name: sessionName,
       description: sessionDesc,
-      created: new Date(Date.now()),
+      created: new Date(Date.now()).toISOString(),
       questions: questionList,
     };
     setQuestionerList([...questionerList, newQuestioner]);
