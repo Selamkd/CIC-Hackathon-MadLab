@@ -24,6 +24,7 @@
     "react-native-color-picker": "^0.6.0",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.14.0",
+    "react-native-paper": "^5.12.3",
     "react-native-web": "~0.19.6",
     "uuid": "^9.0.1",
     "xlsx": "^0.18.5"

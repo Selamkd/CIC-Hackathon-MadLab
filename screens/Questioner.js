@@ -7,7 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import DropdownInput from '../components/SurvayItem';
+import { NativeBaseProvider } from 'native-base';
 import { useSurvayLog } from '../components/context/SurvayLogListContext';
+
 // import generateExcelFromJson from '../utils/Export';
 
 export default function Questioner({ route, navigation }) {
@@ -78,17 +81,35 @@ export default function Questioner({ route, navigation }) {
       />
     </View>
   );
+  const RenderDropdownInput = ({ item }) => {
+    return (
+      <DropdownInput item={item} setAnswer={setAnswers} answer={answers} />
+    );
+  };
   return (
     <View style={styles.container}>
       {formData ? (
-        <View>
+        <View style={styles.box}>
           <Text style={styles.heading}>{formData.name}</Text>
           <Text>Completed Survays: {counter}</Text>
-          <FlatList
-            data={formData.questions}
-            renderItem={renderQuestionItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+          <NativeBaseProvider>
+            {}
+            <FlatList
+              data={formData.questions}
+              // renderItem={renderQuestionItem}
+              ItemSeparatorComponent={() => (
+                <View
+                  style={[
+                    { margin: 10 },
+                    { justifyContent: 'space-around' },
+                    { height: 10 },
+                  ]}
+                />
+              )}
+              renderItem={RenderDropdownInput}
+              keyExtractor={(item) => item.id.toString()}
+            />
+          </NativeBaseProvider>
           <TouchableOpacity
             style={styles.submitButton}
             onPressIn={() => {
@@ -109,7 +130,7 @@ export default function Questioner({ route, navigation }) {
           {/* <TouchableOpacity
             style={styles.submitButton}
             // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
-          >
+            >
             <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity> */}
         </View>
@@ -121,6 +142,9 @@ export default function Questioner({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  box: {
+    flex: 3,
+  },
   container: {
     flex: 1,
 
