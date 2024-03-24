@@ -1,10 +1,4 @@
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-} from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import React, { useState } from 'react';
 import {
   Button,
@@ -14,72 +8,42 @@ import {
   Text,
   Center,
 } from 'native-base';
-// export const renderQuestionItem = ({ item, setAnswer, answer }) => {
-//   //answer = new input
-//   const handleAnswerChange = (selectedAnswer) => {
-//     setAnswer((prevAnswers) => ({
-//       ...prevAnswers,
-//       [item.text]: selectedAnswer,
-//     }));
-//   };
-//   return (
-//     <View style={styles.questionItem}>
-//       <Text style={styles.questionText}>{item.text}</Text>
-//       <TextInput
-//         style={styles.answerInput}
-//         placeholder="Your answer"
-//         onChangeText={(text) => handleAnswerChange(item.text, text)}
-//       />
-//     </View>
-//   );
-// };
+import RenderActionList from './inputType/OptionInput';
+import RenderTextInput from './inputType/TextInput';
 
-export default function DropdownInput(props) {
-  const { item, setAnswer, answer } = props;
-  const qItem = item;
+export default function InputRender(props) {
   const ww = Dimensions.get('window').width;
   const wh = Dimensions.get('window').height;
+  const { item, setAnswer, answer } = props;
+  const qItem = item;
   const { isOpen, onOpen, onClose } = useDisclose();
-  const [hoveredItem, setHoveredItem] = useState('');
-  console.log('im inn', qItem);
 
-  const handlePressIn = (item) => {
-    setHoveredItem(item);
-  };
-
-  const handlePressOut = () => {
-    setHoveredItem('');
-  };
+  const [inputValue, setInputValue] = useState(
+    answer[qItem.label] || 'Answer Here...'
+  );
 
   const handleSelect = (item) => {
-    console.log('select: ', item);
-    setInputValue(item);
-    setAnswer((prev) => ({ ...prev, [qItem.label]: item }));
+    setAnswer({ ...answer, [qItem.label]: item });
+
+    // setInputValue(item);
     onClose();
   };
-  const [inputValue, setInputValue] = useState('...Select you answer...');
-  const renderItem = ({ item }) => {
-    const isHovered = hoveredItem === item;
-    console.log('survayLogs', answer);
-    return (
-      <Actionsheet.Item
-        onPress={() => handleSelect(item)}
-        _hover={{ backgroundColor: 'lightgreen' }}
-        borderColor={isHovered ? 'lightblue' : 'transparent'}
-        borderWidth={1}
-        onPressIn={() => handlePressIn(qItem)}
-        onPressOut={handlePressOut}
-        w={ww * 0.95}
-        mb={2}
-        pl={10}
-        p={2}
-        justifyContent={'center'}
-      >
-        {`${item}`}
-      </Actionsheet.Item>
-    );
+  const InputSwitch = (item) => {
+    switch (item.type) {
+      case 'option':
+        return <RenderActionList qitem={item} handleSelect={handleSelect} />;
+      case 'text':
+        return (
+          <RenderTextInput
+            qitem={item}
+            handleSelect={handleSelect}
+            answer={answer}
+          />
+        );
+      default:
+        break;
+    }
   };
-
   return (
     <Box
       style={[{ justifyContent: 'space-between' }, { marginBottom: 20 }]}
@@ -95,10 +59,9 @@ export default function DropdownInput(props) {
         <Button
           w={ww * 0.8}
           backgroundColor={
-            inputValue === '...Select you answer...' ? 'gray.500' : 'teal.600'
+            inputValue === 'Answer Here...' ? 'gray.500' : 'teal.600'
           }
           onPress={onOpen}
-          onPressOut={() => {}}
         >
           {inputValue}
         </Button>
@@ -112,6 +75,7 @@ export default function DropdownInput(props) {
             <Center>
               <Actionsheet.Content
                 w={ww}
+                minH={wh}
                 borderTopRadius={20}
                 bg={'#eff8ff'}
                 p={0}
@@ -136,16 +100,7 @@ export default function DropdownInput(props) {
                     {item.text}
                   </Text>
                 </Box>
-                <Center>
-                  <FlatList
-                    style={styles.list}
-                    data={qItem.options}
-                    renderItem={({ item }) => renderItem({ item })}
-                    keyExtractor={(item, index) =>
-                      index.toString() + item.toString()
-                    }
-                  />
-                </Center>
+                {InputSwitch(qItem)}
               </Actionsheet.Content>
             </Center>
           </Box>

@@ -7,9 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import DropdownInput from '../components/SurvayItem';
+import InputRender from '../components/SurvayItem';
 import { NativeBaseProvider } from 'native-base';
 import { useSurvayLog } from '../components/context/SurvayLogListContext';
+import { ScrollView } from 'react-native-virtualized-view';
 
 // import generateExcelFromJson from '../utils/Export';
 
@@ -20,7 +21,7 @@ export default function Questioner({ route, navigation }) {
   const [counter, steCounter] = useState(0);
   const [sessionName, setSessionName] = useState();
   const { stateSurvayLog, dispatchSurvayLog } = useSurvayLog();
-  console.log(stateSurvayLog.data);
+  // console.log(stateSurvayLog.data);
 
   useEffect(() => {
     const now = new Date(Date.now());
@@ -47,12 +48,12 @@ export default function Questioner({ route, navigation }) {
   //     .catch((er) => console.log(er));
   // }, []);
 
-  const handleAnswerChange = (questionId, answer) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [questionId]: answer,
-    }));
-  };
+  // const handleAnswerChange = (questionId, answer) => {
+  //   setAnswers((prevAnswers) => ({
+  //     ...prevAnswers,
+  //     [questionId]: answer,
+  //   }));
+  // };
   const handleFormSubmit = (sessName) => {
     // console.log(sessName);
     console.log(answers[sessName], sessName);
@@ -71,21 +72,29 @@ export default function Questioner({ route, navigation }) {
     steCounter(counter + 1);
   };
 
-  const renderQuestionItem = ({ item }) => (
-    <View style={styles.questionItem}>
-      <Text style={styles.questionText}>{item.text}</Text>
-      <TextInput
-        style={styles.answerInput}
-        placeholder="Your answer"
-        onChangeText={(text) => handleAnswerChange(item.text, text)}
-      />
-    </View>
-  );
-  const RenderDropdownInput = ({ item }) => {
+  const RenderQuestionItem = ({ item, setAnswer, answer }) => {
+    console.log('............................', item);
+    const handleAnswerChange = (input) => {
+      setAnswer((prevAnswers) => ({
+        ...prevAnswers,
+        [item.label]: input,
+      }));
+    };
     return (
-      <DropdownInput item={item} setAnswer={setAnswers} answer={answers} />
+      <View style={styles.questionItem}>
+        <Text style={styles.questionText}>{item.text}</Text>
+        <TextInput
+          style={styles.answerInput}
+          placeholder="Your answer"
+          onChangeText={(text) => handleAnswerChange(text)}
+        />
+      </View>
     );
   };
+  const renderSurvay = ({ item }) => (
+    <InputRender item={item} setAnswer={setAnswers} answer={answers} />
+  );
+
   return (
     <View style={styles.container}>
       {formData ? (
@@ -93,24 +102,28 @@ export default function Questioner({ route, navigation }) {
           <Text style={styles.heading}>{formData.name}</Text>
           <Text>Completed Survays: {counter}</Text>
           <NativeBaseProvider>
-            {}
-            <FlatList
-              data={formData.questions}
-              // renderItem={renderQuestionItem}
-              ItemSeparatorComponent={() => (
-                <View
-                  style={[
-                    { margin: 10 },
-                    { justifyContent: 'space-around' },
-                    { height: 10 },
-                  ]}
+            <ScrollView>
+              <View style={styles.box}>
+                <FlatList
+                  data={formData.questions}
+                  estedScrollEnabled={true}
+                  // renderItem={renderQuestionItem}
+                  ItemSeparatorComponent={() => (
+                    <View
+                      style={[
+                        { margin: 10 },
+                        { justifyContent: 'space-around' },
+                        { height: 10 },
+                      ]}
+                    />
+                  )}
+                  renderItem={renderSurvay}
+                  keyExtractor={(item) => item.id.toString()}
                 />
-              )}
-              renderItem={RenderDropdownInput}
-              keyExtractor={(item) => item.id.toString()}
-            />
+              </View>
+            </ScrollView>
           </NativeBaseProvider>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.submitButton}
             onPressIn={() => {
               handleFormSubmit(sessionName);
@@ -118,14 +131,14 @@ export default function Questioner({ route, navigation }) {
             }}
             onPressOut={() => {
               // storeData('responseStore', responsStore).then(() => {
-              //   setAnswers({});
+                //   setAnswers({});
               //   setFormData(null);
               //   console.log(answers);
               // });
             }}
           >
             <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* <TouchableOpacity
             style={styles.submitButton}
@@ -144,6 +157,7 @@ export default function Questioner({ route, navigation }) {
 const styles = StyleSheet.create({
   box: {
     flex: 3,
+    position: 'relative',
   },
   container: {
     flex: 1,
