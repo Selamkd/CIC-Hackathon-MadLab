@@ -1,29 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  // FlatList,
   TextInput,
+  SectionList,
   TouchableOpacity,
+  Footer,
 } from 'react-native';
 import InputRender from '../components/SurvayItem';
-import { NativeBaseProvider } from 'native-base';
+import {
+  Box,
+  NativeBaseProvider,
+  FlatList,
+  // ScrollView
+} from 'native-base';
 import { useSurvayLog } from '../components/context/SurvayLogListContext';
 import { ScrollView } from 'react-native-virtualized-view';
 
 // import generateExcelFromJson from '../utils/Export';
 
 export default function Questioner({ route, navigation }) {
+  const questionListRef = useRef(null);
   const payload = route.params?.payload;
   const [formData, setFormData] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [counter, steCounter] = useState(0);
   const [sessionName, setSessionName] = useState();
-  const { stateSurvayLog, dispatchSurvayLog } = useSurvayLog();
-  // console.log(stateSurvayLog.data);
+  const [submitDisabled, setSubmitDisabled] = useState(true);
 
+  const { stateSurvayLog, dispatchSurvayLog } = useSurvayLog();
+  // console.log('survayLog Data:   ', stateSurvayLog.data);
+  const scrollToIndex = (index) => {
+    if (questionListRef.current) {
+      const scrollIndex = index === 1 ? index + 1 : index - 1;
+      console.log('inex:  ', index);
+      questionListRef.current.scrollToIndex({ index, animated: true });
+    }
+  };
   useEffect(() => {
+    const isAllAnswered = (questionList, answerObj) => {
+      const answerKeys = Object.keys(answerObj);
+      if (answerKeys.length !== questionList.length) return false;
+      for (let key of answerKeys) {
+        if (!answerObj[key]) return false;
+        if (answerObj[key] === 'Answer Here...') return false;
+      }
+      return true;
+    };
     const now = new Date(Date.now());
     const fileName = `${payload.name}-${now.getDate()}.${
       now.getMonth() + 1
@@ -39,21 +64,10 @@ export default function Questioner({ route, navigation }) {
     };
 
     loadFormData();
+    console.log('set submit to: ', answers);
+    setSubmitDisabled(!isAllAnswered(payload.questions, answers));
   }, [payload, answers]);
-  // useEffect(() => {
-  //   getData('responseStore')
-  //     .then((data) => {
-  //       data ? setResponeStore(data) : storeData('responseStore', []);
-  //     })
-  //     .catch((er) => console.log(er));
-  // }, []);
 
-  // const handleAnswerChange = (questionId, answer) => {
-  //   setAnswers((prevAnswers) => ({
-  //     ...prevAnswers,
-  //     [questionId]: answer,
-  //   }));
-  // };
   const handleFormSubmit = (sessName) => {
     // console.log(sessName);
     console.log(answers[sessName], sessName);
@@ -72,85 +86,79 @@ export default function Questioner({ route, navigation }) {
     steCounter(counter + 1);
   };
 
-  const RenderQuestionItem = ({ item, setAnswer, answer }) => {
-    console.log('............................', item);
-    const handleAnswerChange = (input) => {
-      setAnswer((prevAnswers) => ({
-        ...prevAnswers,
-        [item.label]: input,
-      }));
-    };
-    return (
-      <View style={styles.questionItem}>
-        <Text style={styles.questionText}>{item.text}</Text>
-        <TextInput
-          style={styles.answerInput}
-          placeholder="Your answer"
-          onChangeText={(text) => handleAnswerChange(text)}
-        />
-      </View>
-    );
-  };
-  const renderSurvay = ({ item }) => (
-    <InputRender item={item} setAnswer={setAnswers} answer={answers} />
+  const renderSurvay = ({ item, index }) => (
+    <InputRender
+      item={item}
+      setAnswer={setAnswers}
+      answer={answers}
+      scroll={scrollToIndex}
+      index={index}
+    />
   );
 
   return (
-    <View style={styles.container}>
-      {formData ? (
-        <View style={styles.box}>
-          <Text style={styles.heading}>{formData.name}</Text>
-          <Text>Completed Survays: {counter}</Text>
-          <NativeBaseProvider>
-            <ScrollView>
-              <View style={styles.box}>
-                <FlatList
-                  data={formData.questions}
-                  estedScrollEnabled={true}
-                  // renderItem={renderQuestionItem}
-                  ItemSeparatorComponent={() => (
-                    <View
-                      style={[
-                        { margin: 10 },
-                        { justifyContent: 'space-around' },
-                        { height: 10 },
-                      ]}
-                    />
-                  )}
-                  renderItem={renderSurvay}
-                  keyExtractor={(item) => item.id.toString()}
-                />
-              </View>
-            </ScrollView>
-          </NativeBaseProvider>
-          {/* <TouchableOpacity
-            style={styles.submitButton}
-            onPressIn={() => {
-              handleFormSubmit(sessionName);
-              // setResponeStore([...responsStore, answers]);
-            }}
-            onPressOut={() => {
-              // storeData('responseStore', responsStore).then(() => {
-                //   setAnswers({});
-              //   setFormData(null);
-              //   console.log(answers);
-              // });
-            }}
-          >
-            <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity> */}
+    <NativeBaseProvider>
+      <View style={styles.container}>
+        {formData ? (
+          <View style={styles.box}>
+            <Text style={styles.heading}>{formData.name}</Text>
+            <Text>Completed Survays: {counter}</Text>
 
-          {/* <TouchableOpacity
+            <View style={styles.box}>
+              <FlatList
+                ref={questionListRef}
+                data={formData.questions}
+                ItemSeparatorComponent={() => (
+                  <View
+                    style={[
+                      { margin: 10 },
+                      { justifyContent: 'space-around' },
+                      { height: 10 },
+                    ]}
+                  />
+                )}
+                renderItem={({ item, index }) => renderSurvay({ item, index })}
+                keyExtractor={(item, index) => index.toString()}
+                ListFooterComponent={
+                  <Box h={300}>
+                    <TouchableOpacity
+                      disabled={submitDisabled}
+                      style={[
+                        styles.submitButton,
+                        {
+                          backgroundColor: submitDisabled ? 'gray' : '#51ad63',
+                        },
+                      ]}
+                      onPressIn={() => {
+                        handleFormSubmit(sessionName);
+                        // setResponeStore([...responsStore, answers]);
+                      }}
+                      onPressOut={() => {
+                        // storeData('responseStore', responsStore).then(() => {
+                        //   setAnswers({});
+                        //   setFormData(null);
+                        //   console.log(answers);
+                        // });
+                      }}
+                    >
+                      <Text style={styles.submitButtonText}>Submit</Text>
+                    </TouchableOpacity>
+                  </Box>
+                }
+              />
+            </View>
+            {/* <TouchableOpacity
             style={styles.submitButton}
             // onPress={generateExcelFromJson(JSON.stringify(responsStore, 'Response'))}
             >
             <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity> */}
-        </View>
-      ) : (
-        <Text>Loading form data...</Text>
-      )}
-    </View>
+          </View>
+        ) : (
+          <Text>Loading form data...</Text>
+        )}
+      </View>
+    </NativeBaseProvider>
   );
 }
 
@@ -185,7 +193,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   submitButton: {
-    backgroundColor: '#51ad63',
     padding: 15,
 
     alignItems: 'center',

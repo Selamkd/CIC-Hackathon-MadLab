@@ -17,7 +17,7 @@ export default RenderTextInput = ({ qitem, handleSelect, answer }) => {
             textInputState === 'Answer Here...' && setTextInputState('');
           }}
           onEndEditing={() => {
-            handleSelect(textInputState);
+            handleSelect(textInputState || 'Answer Here...');
             setTextInputState('Answer Here...');
           }}
           onChangeText={(text) => setTextInputState(text)}
