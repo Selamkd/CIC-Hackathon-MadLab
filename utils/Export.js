@@ -1,26 +1,31 @@
-import XLSX from 'xlsx';
-import RNFS from 'react-native-fs';
+import * as XLSX from 'xlsx';
+import * as FileFystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
-const generateExcelFromJson = (jsonData, name) => {
+export default generateExcelFromJson = (jsonData, name) => {
+  const now = new Date(Date.now());
+  const fileName = `${name}-${now.getDate()}.${
+    now.getMonth() + 1
+  }.${now.getFullYear()}`;
   return new Promise((resolve, reject) => {
     try {
-      // Convert JSON data to worksheet
       const worksheet = XLSX.utils.json_to_sheet(jsonData);
-
-      // Create a workbook
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, `${name} ${new Date(Date.now())}`);
+      XLSX.utils.book_append_sheet(workbook, worksheet, fileName, true);
 
       // Generate Excel file
-      const wbout = XLSX.write(workbook, { type: 'binary', bookType: 'xlsx' });
+      const wbout = XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
 
       // Prepare file path
-      const filePath = RNFS.DocumentDirectoryPath + '/data.xlsx';
-
+      const filePath = FileFystem.documentDirectory + `${fileName}.xlsx`;
+      console.log(filePath);
       // Write the file
-      RNFS.writeFile(filePath, wbout, 'ascii')
+      FileFystem.writeAsStringAsync(filePath, wbout, {
+        encoding: FileFystem.EncodingType.Base64,
+      })
         .then(() => {
-          resolve(filePath);
+          resolve(`${name}`);
+          Sharing.shareAsync(filePath);
         })
         .catch((err) => {
           reject(err);
@@ -30,5 +35,3 @@ const generateExcelFromJson = (jsonData, name) => {
     }
   });
 };
-
-export default generateExcelFromJson;

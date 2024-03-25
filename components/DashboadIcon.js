@@ -6,12 +6,14 @@ import {
   View,
   ActivityIndicator,
   Alert,
+  // TouchableOpacity,
 } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { getData, storeData } from '../utils/AsyncStorage';
-import { useSurvayList } from './context/AllContext';
-
+import generateExcelFromJson from '../utils/Export';
+import { useSurvayList } from './context/SurvayLisContext';
+import { useSurvayLog } from './context/SurvayLogListContext';
 export default function DashboardIcon({
   title,
   navigation,
@@ -20,9 +22,30 @@ export default function DashboardIcon({
   session,
 }) {
   const [isLive, setIsLive] = useState(false);
-  const { dispatchSurvayList } = useSurvayList();
   [sessionForms, setSessionForms] = session;
+  const { dispatchSurvayList } = useSurvayList();
+  const { stateSurvayLog, dispatchSurvayLog } = useSurvayLog();
 
+  const findLogInObj = (survayLog, tilte) => {
+    const titleRegEx = new RegExp(title);
+    const filtered = Object.keys(survayLog.data).filter((name) =>
+      titleRegEx.test(name)
+    );
+    return filtered.length === 1
+      ? filtered[0]
+      : Alert.alert('more,then one under this title', [...filtered]);
+  };
+  const exportToExcel = async (data, name) => {
+    try {
+      await generateExcelFromJson(data, name).then();
+      console.log('Export successful');
+      setIsLive(false);
+      //remove fromLOG???
+      Alert.alert(`${name}`, 'Summary saved on the device.');
+    } catch (error) {
+      console.log('Error exporting:', error);
+    }
+  };
   const handleRemoveForm = (form) => {
     Alert.alert(
       'Think about it!',
@@ -48,11 +71,53 @@ export default function DashboardIcon({
       ]
     );
   };
+  const DownloadForm = (form) => {
+    console.log(form);
+    Alert.alert(
+      'Download Summary',
+      `After downloding the summary ${
+        form.name || 'this'
+      } form this sessiont resets.`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            const name = findLogInObj(stateSurvayLog, form.name);
+            const data = stateSurvayLog.data[name];
+            console.log(
+              stateSurvayLog.data,
+
+              form.name,
+              data
+            );
+            exportToExcel(data, name);
+            // getData(`${form.name}-Survay`)
+            //   .then((data) =>
+            //     generateExcelFromJson(data, form.name)
+            //       .then((x) => {
+            //         // setIsLive(false);
+            //         // Alert.alert(`${x}`, 'Summary saved on the device.');
+            //       })
+            //       .catch((err) => {
+            //         console.log(err);
+            //       })
+            //   )
+            //   .catch((err) => console.log(err));
+          },
+        },
+      ]
+    );
+  };
   return (
     <View>
       <View style={styles.relativeContainer}>
         <TouchableOpacity
-          style={isLive ? styles.isLive : styles.container}
+          style={isLive ? [styles.container, styles.isLive] : styles.container}
           onPress={() => {
             setIsLive(true);
             navigation.navigate('Questioner', { payload });
@@ -67,66 +132,80 @@ export default function DashboardIcon({
           style={styles.removeButton}
           onPress={() => handleRemoveForm(payload)}
         >
-          <Text style={styles.removeButtonText}>⤓</Text>
+          <Text style={styles.removeButtonText}>X</Text>
         </TouchableOpacity>
+        {isLive && (
+          <TouchableOpacity
+            style={[styles.removeButton, styles.downloadBtn]}
+            onPress={() => DownloadForm(payload, payload.name)}
+          >
+            <Text style={styles.downloadLabel}>⤓</Text>
+            <View style={styles.label}>
+              <Text>In progress...</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  label: {
+    position: 'absolute',
+    bottom: 50,
+    right: -60,
+    width: 80,
+  },
   container: {
     // position: 'absolute',
     backgroundColor: '#e6e6e6',
-    marginBottom: 10,
+    margin: 10,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 25,
     padding: 10,
-    width: 350,
-    height: 200,
+    width: '96%',
+    height: '96%',
   },
   relativeContainer: {
     position: 'relative',
     flex: 1,
-
     justifyContent: 'center',
-    width: 360,
-    height: 270,
+    // paddingtop: 10,
+    marginTop: 20,
+    width: 350,
+    height: 200,
   },
   removeButton: {
-    bottom: 215,
-
-    left: 310,
-
+    bottom: 210,
+    left: 315,
     backgroundColor: 'red',
-
     borderRadius: 5,
-
     width: 45,
-
     height: 45,
-
     alignItems: 'center',
-
     justifyContent: 'center',
+  },
+  downloadBtn: {
+    position: 'absolute',
+    bottom: 35,
+    left: 0,
+    backgroundColor: '#e6e6e6',
   },
 
   removeButtonText: {
     color: '#fff',
-
     fontSize: 20,
-
+    fontWeight: 'bold',
+  },
+  downloadLabel: {
+    color: 'black',
+    fontSize: 25,
     fontWeight: 'bold',
   },
   isLive: {
-    backgroundColor: 'green',
-    marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-    padding: 10,
-    width: 350,
-    height: 200,
+    backgroundColor: '#90ee9090',
   },
   iconShadow: {
     shadowColor: 'black',

@@ -1,21 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  // FlatList,
-  TextInput,
-  SectionList,
-  TouchableOpacity,
-  Footer,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import InputRender from '../components/SurvayItem';
-import {
-  Box,
-  NativeBaseProvider,
-  FlatList,
-  // ScrollView
-} from 'native-base';
+import { Box, NativeBaseProvider, FlatList } from 'native-base';
 import { useSurvayLog } from '../components/context/SurvayLogListContext';
 import { ScrollView } from 'react-native-virtualized-view';
 
@@ -131,14 +117,6 @@ export default function Questioner({ route, navigation }) {
                       ]}
                       onPressIn={() => {
                         handleFormSubmit(sessionName);
-                        // setResponeStore([...responsStore, answers]);
-                      }}
-                      onPressOut={() => {
-                        // storeData('responseStore', responsStore).then(() => {
-                        //   setAnswers({});
-                        //   setFormData(null);
-                        //   console.log(answers);
-                        // });
                       }}
                     >
                       <Text style={styles.submitButtonText}>Submit</Text>
